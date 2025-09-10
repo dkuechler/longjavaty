@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class LoginController {
 
+    private final LoginProcessor loginProcessor;
+
     @Autowired
-    private LoginProcessor loginProcessor;
+    public LoginController(LoginProcessor loginProcessor) {
+        this.loginProcessor = loginProcessor;
+    }
 
     @GetMapping("/")
     public String loginGet() {
@@ -21,15 +25,13 @@ public class LoginController {
 
     @PostMapping("/")
     public String loginPost(@RequestParam String username, @RequestParam String password, Model model) {
-        loginProcessor.setUsername(username);
-        loginProcessor.setPassword(password);
-        var loggedIn = loginProcessor.login();
+        var loggedIn = loginProcessor.login(username, password);
 
         if (loggedIn) {
-            model.addAttribute("message", "Login successful!");
+            return "redirect:/main?name=" + username;
         } else {
-            model.addAttribute("message", "Login failed. Please try again.");
         }
+            model.addAttribute("message", "Login failed. Please try again.");
         return "login";
     }
 }
