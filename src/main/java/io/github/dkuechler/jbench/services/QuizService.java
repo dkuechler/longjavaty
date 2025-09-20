@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import jakarta.annotation.PostConstruct;
 
 import io.github.dkuechler.jbench.model.QuizQuestion;
 
@@ -13,6 +14,19 @@ public class QuizService {
     // TODO replace with a database
     private List<QuizQuestion> questions = new ArrayList<>();
     private Long nextId = 1L;
+
+    @PostConstruct
+    public void initializeQuestions() {
+        // debugging questions
+        addQuestion(new QuizQuestion(null, "What is the capital of France?", 
+            List.of("London", "New York", "Paris", "Madrid"), 2, "Geography"));
+
+        addQuestion(new QuizQuestion(Long.valueOf(42), "What is the capital of Germany?", 
+            List.of("Munich", "Berlin"), 2, "Geography"));
+        
+        addQuestion(new QuizQuestion(Long.valueOf(0), "What is 2 + 2?", 
+            List.of("3", "6"), 1, "Math"));
+    }
 
     public QuizQuestion addQuestion(QuizQuestion question) {
         QuizQuestion questionWithId = new QuizQuestion(
