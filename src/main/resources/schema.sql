@@ -1,5 +1,5 @@
 CREATE TABLE quiz_questions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     question TEXT NOT NULL,
     options TEXT NOT NULL,
     correct_answer_index INTEGER NOT NULL,
