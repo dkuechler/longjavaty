@@ -18,23 +18,22 @@ public class QuizService {
     @PostConstruct
     public void initializeQuestions() {
         // debugging questions
-        addQuestion(new QuizQuestion(null, "What is the capital of France?", 
+        addQuestion(new QuizQuestion("What is the capital of France?", 
             List.of("London", "New York", "Paris", "Madrid"), 2, "Geography"));
 
-        addQuestion(new QuizQuestion(Long.valueOf(42), "What is the capital of Germany?", 
-            List.of("Munich", "Berlin"), 2, "Geography"));
+        addQuestion(new QuizQuestion("What is the capital of Germany?", 
+            List.of("Munich", "Berlin"), 1, "Geography"));
         
-        addQuestion(new QuizQuestion(Long.valueOf(0), "What is 2 + 2?", 
-            List.of("3", "6"), 1, "Math"));
+        addQuestion(new QuizQuestion("What is 2 + 2?", 
+            List.of("3", "4"), 1, "Math"));
     }
 
     public QuizQuestion addQuestion(QuizQuestion question) {
         QuizQuestion questionWithId = new QuizQuestion(
-            nextId++,
-            question.question(),
-            question.options(),
-            question.correctAnswerIndex(),
-            question.category()
+            question.getQuestion(),
+            question.getOptions(),
+            question.getCorrectAnswerIndex(),
+            question.getCategory()
         );
         questions.add(questionWithId);
         return questionWithId;
@@ -46,13 +45,13 @@ public class QuizService {
 
     public Optional<QuizQuestion> getQuestionById(Long id) {
         return questions.stream()
-            .filter(q -> q.id().equals(id))
+            .filter(q -> q.getId().equals(id))
             .findFirst();
     }
 
     public List<QuizQuestion> getQuestionsByCategory(String category) {
         return questions.stream()
-            .filter(q -> q.category().equalsIgnoreCase(category))
+            .filter(q -> q.getCategory().equalsIgnoreCase(category))
             .toList();
     }
 }
