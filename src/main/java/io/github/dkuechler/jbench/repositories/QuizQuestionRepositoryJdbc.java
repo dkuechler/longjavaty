@@ -43,7 +43,6 @@ public class QuizQuestionRepositoryJdbc {
         }
         Long generatedId = key.longValue();
         
-        // Create new question and set the ID
         QuizQuestion savedQuestion = new QuizQuestion(
             question.getQuestion(),
             question.getOptions(),

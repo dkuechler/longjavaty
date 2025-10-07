@@ -35,6 +35,7 @@ public class QuizService {
             question.getCorrectAnswerIndex(),
             question.getCategory()
         );
+        questionWithId.setId(nextId++);
         questions.add(questionWithId);
         return questionWithId;
     }
@@ -44,8 +45,11 @@ public class QuizService {
     }
 
     public Optional<QuizQuestion> getQuestionById(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return questions.stream()
-            .filter(q -> q.getId().equals(id))
+            .filter(q -> q.getId() != null && q.getId().equals(id))
             .findFirst();
     }
 
