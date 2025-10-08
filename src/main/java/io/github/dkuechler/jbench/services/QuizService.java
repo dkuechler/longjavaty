@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.PostConstruct;
 
 import io.github.dkuechler.jbench.model.QuizQuestion;
+import io.github.dkuechler.jbench.model.QuizResult;
 
 @Service
 public class QuizService {
@@ -57,5 +58,22 @@ public class QuizService {
         return questions.stream()
             .filter(q -> q.getCategory().equalsIgnoreCase(category))
             .toList();
+    }
+    
+    public QuizResult checkAnswer(Long questionId, String userAnswer) {
+        Optional<QuizQuestion> questionOpt = getQuestionById(questionId);
+        if (questionOpt.isEmpty()) {
+            return null;
+        }
+        
+        QuizQuestion question = questionOpt.get();
+        String correctAnswer = question.getOptions().get(question.getCorrectAnswerIndex());
+        boolean isCorrect = correctAnswer.equalsIgnoreCase(userAnswer);
+        
+        return new QuizResult(questionId, question.getQuestion(), userAnswer, correctAnswer, isCorrect);
+    }
+    
+    public int calculateScore(List<QuizResult> results) {
+        return (int) results.stream().mapToInt(r -> r.correct() ? 1 : 0).sum();
     }
 }
