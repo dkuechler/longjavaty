@@ -1,8 +1,8 @@
-package io.github.dkuechler.jbench.repositories;
+package io.github.dkuechler.longjavaty.healthmetrics.repository;
 
-import io.github.dkuechler.jbench.model.Measurement;
-import io.github.dkuechler.jbench.model.MeasurementType;
-import io.github.dkuechler.jbench.model.AppUser;
+import io.github.dkuechler.longjavaty.healthmetrics.model.Measurement;
+import io.github.dkuechler.longjavaty.healthmetrics.model.MeasurementType;
+import io.github.dkuechler.longjavaty.users.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

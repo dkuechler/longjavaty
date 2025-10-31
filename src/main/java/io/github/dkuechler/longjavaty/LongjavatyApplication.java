@@ -1,13 +1,13 @@
-package io.github.dkuechler.jbench;
+package io.github.dkuechler.longjavaty;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JbenchApplication {
+public class LongjavatyApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(JbenchApplication.class, args);
+        SpringApplication.run(LongjavatyApplication.class, args);
     }
 
 }

@@ -1,5 +1,6 @@
-package io.github.dkuechler.jbench.model;
+package io.github.dkuechler.longjavaty.healthmetrics.model;
 
+import io.github.dkuechler.longjavaty.users.model.AppUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

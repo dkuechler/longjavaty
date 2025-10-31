@@ -1,4 +1,4 @@
-package io.github.dkuechler.jbench.model;
+package io.github.dkuechler.longjavaty.users.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

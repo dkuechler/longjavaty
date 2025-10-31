@@ -1,4 +1,4 @@
-package io.github.dkuechler.jbench.model;
+package io.github.dkuechler.longjavaty.healthmetrics.model;
 
 public enum MeasurementType {
     HEART_RATE("bpm"),

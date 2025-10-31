@@ -1,4 +1,4 @@
-package io.github.dkuechler.jbench.config;
+package io.github.dkuechler.longjavaty.config;
 
 import java.util.Arrays;
 

@@ -9,10 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.github.dkuechler</groupId>
-    <artifactId>jbench</artifactId>
+    <artifactId>longjavaty</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>jbench</name>
-    <description>jbench</description>
+    <name>longjavaty</name>
     <url/>
     <licenses>
         <license/>

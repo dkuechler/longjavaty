@@ -1,6 +1,6 @@
-package io.github.dkuechler.jbench.repositories;
+package io.github.dkuechler.longjavaty.users.repository;
 
-import io.github.dkuechler.jbench.model.AppUser;
+import io.github.dkuechler.longjavaty.users.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
