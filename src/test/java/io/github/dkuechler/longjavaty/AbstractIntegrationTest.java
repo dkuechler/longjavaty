@@ -1,0 +1,31 @@
+package io.github.dkuechler.longjavaty;
+
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+/**
+ * Base test class that provides PostgreSQL test container for integration tests.
+ * All integration tests should extend this class to ensure consistent test environment.
+ */
+@SpringBootTest
+@Testcontainers
+public abstract class AbstractIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgresql = new PostgreSQLContainer<>("postgres:15-alpine")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test")
+            .withReuse(true); // Reuse container across test classes for faster execution
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresql::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresql::getUsername);
+        registry.add("spring.datasource.password", postgresql::getPassword);
+    }
+}
