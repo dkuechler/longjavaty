@@ -12,11 +12,11 @@ import java.time.OffsetDateTime;
 @Table(name = "measurement",
        uniqueConstraints = @UniqueConstraint(
            name = "uk_measurement_dedup",
-           columnNames = {"user_id", "measurement_type", "source_id"}
+           columnNames = {"user_id", "measurement_type", "external_source_id"}
        ),
        indexes = {
-           @Index(name = "ix_measurement_user_type_ts", 
-                  columnList = "user_id, measurement_type, timestamp DESC")
+           @Index(name = "ix_measurement_user_type_ts",
+                  columnList = "user_id, measurement_type, recorded_at DESC")
        })
 @Getter @Setter @NoArgsConstructor
 public class Measurement {
@@ -33,13 +33,13 @@ public class Measurement {
     @Column(name = "measurement_type", nullable = false)
     private MeasurementType measurementType;
     
-    @Column(nullable = false)
+    @Column(name = "value_numeric", nullable = false)
     private Double value;
     
-    @Column(nullable = false)
+    @Column(name = "recorded_at", nullable = false)
     private OffsetDateTime timestamp;
     
-    @Column(name = "source_id", nullable = false, length = 255)
+    @Column(name = "external_source_id", nullable = false, length = 255)
     private String sourceId;
     
     public Measurement(AppUser user, MeasurementType measurementType, Double value, 
