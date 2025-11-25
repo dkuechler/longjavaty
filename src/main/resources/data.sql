@@ -1,3 +1,4 @@
+DELETE FROM workout;
 DELETE FROM measurement;
 DELETE FROM app_user;
 
@@ -11,5 +12,11 @@ INSERT INTO measurement (user_id, measurement_type, value_numeric, recorded_at, 
 ('550e8400-e29b-41d4-a716-446655440000', 'HEART_RATE', 68, '2024-11-03 10:00:00', 'apple_hr_2'),
 ('550e8400-e29b-41d4-a716-446655440000', 'STEPS', 8543, '2024-11-04 10:00:00', 'apple_steps_1'),
 ('550e8400-e29b-41d4-a716-446655440000', 'STEPS', 12450, '2024-11-03 10:00:00', 'apple_steps_2'),
+('550e8400-e29b-41d4-a716-446655440000', 'VO2_MAX', 43.2, '2024-11-02 08:00:00', 'apple_vo2_1'),
 ('550e8400-e29b-41d4-a716-446655440001', 'HEART_RATE', 65, '2024-11-05 09:30:00', 'fitbit_hr_1'),
-('550e8400-e29b-41d4-a716-446655440001', 'STEPS', 15234, '2024-11-05 09:30:00', 'fitbit_steps_1');
+('550e8400-e29b-41d4-a716-446655440001', 'STEPS', 15234, '2024-11-05 09:30:00', 'fitbit_steps_1'),
+('550e8400-e29b-41d4-a716-446655440001', 'VO2_MAX', 38.5, '2024-11-04 07:45:00', 'fitbit_vo2_1');
+
+INSERT INTO workout (user_id, workout_type, start_time, duration_seconds, calories_burned, distance_meters, source_id) VALUES
+('550e8400-e29b-41d4-a716-446655440000', 'RUN', '2024-11-04 07:00:00', 3600, 650, 10000, 'apple_workout_1'),
+('550e8400-e29b-41d4-a716-446655440001', 'CYCLE', '2024-11-05 06:30:00', 2700, 500, 15000, 'fitbit_workout_1');
