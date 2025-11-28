@@ -1,7 +1,10 @@
 package io.github.dkuechler.longjavaty.healthmetrics.service;
 
 import io.github.dkuechler.longjavaty.healthmetrics.model.Workout;
+import io.github.dkuechler.longjavaty.healthmetrics.model.WorkoutHeartRateSample;
+import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutHeartRateSampleRepository;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutRepository;
+import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutHeartRateSamplesRequest;
 import io.github.dkuechler.longjavaty.users.model.AppUser;
 import io.github.dkuechler.longjavaty.users.repository.AppUserRepository;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,12 @@ import java.util.UUID;
 public class WorkoutService {
 
     private final WorkoutRepository workoutRepository;
+    private final WorkoutHeartRateSampleRepository heartRateSampleRepository;
     private final AppUserRepository appUserRepository;
 
-    public WorkoutService(WorkoutRepository workoutRepository, AppUserRepository appUserRepository) {
+    public WorkoutService(WorkoutRepository workoutRepository, WorkoutHeartRateSampleRepository heartRateSampleRepository, AppUserRepository appUserRepository) {
         this.workoutRepository = workoutRepository;
+        this.heartRateSampleRepository = heartRateSampleRepository;
         this.appUserRepository = appUserRepository;
     }
 
@@ -67,8 +72,31 @@ public class WorkoutService {
         return workoutRepository.findByUserIdOrderByStartTimeDesc(userId);
     }
 
+    @Transactional
+    public List<WorkoutHeartRateSample> recordHeartRateSamples(UUID userId, String externalWorkoutId, List<WorkoutHeartRateSamplesRequest.HeartRateSampleDto> samples) {
+        Workout workout = findWorkout(userId, externalWorkoutId);
+        List<WorkoutHeartRateSample> entities = samples.stream()
+            .map(sample -> new WorkoutHeartRateSample(workout, sample.timestamp(), sample.bpm(), sample.sourceId()))
+            .toList();
+        return heartRateSampleRepository.saveAll(entities);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkoutHeartRateSample> listHeartRateSamples(UUID userId, String externalWorkoutId) {
+        Workout workout = findWorkout(userId, externalWorkoutId);
+        return heartRateSampleRepository.findByWorkoutIdOrderByTimestampDesc(workout.getId());
+    }
+
     private AppUser findUser(UUID userId) {
         return appUserRepository.findById(userId)
             .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+    }
+
+    private Workout findWorkout(UUID userId, String externalWorkoutId) {
+        Workout workout = workoutRepository.findByUserIdAndExternalId(userId, externalWorkoutId);
+        if (workout == null) {
+            throw new NoSuchElementException("Workout not found: " + externalWorkoutId);
+        }
+        return workout;
     }
 }

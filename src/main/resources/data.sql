@@ -1,3 +1,4 @@
+DELETE FROM workout_heart_rate_sample;
 DELETE FROM workout;
 DELETE FROM measurement;
 DELETE FROM app_user;
@@ -20,3 +21,11 @@ INSERT INTO measurement (user_id, measurement_type, value_numeric, recorded_at, 
 INSERT INTO workout (user_id, workout_type, external_id, start_time, end_time, duration_seconds, active_duration_seconds, calories_burned, distance_meters, avg_heart_rate, max_heart_rate, min_heart_rate, route_available, source_id) VALUES
 ('550e8400-e29b-41d4-a716-446655440000', 'RUN', 'apple_run_1', '2024-11-04 07:00:00', '2024-11-04 08:00:00', 3600, 3500, 650, 10000, 150, 170, 120, TRUE, 'com.apple.Health'),
 ('550e8400-e29b-41d4-a716-446655440001', 'CYCLE', 'fitbit_cycle_1', '2024-11-05 06:30:00', '2024-11-05 07:15:00', 2700, 2600, 500, 15000, 140, 160, 110, FALSE, 'com.fitbit.app');
+
+INSERT INTO workout_heart_rate_sample (workout_id, sample_time, bpm, source_id) VALUES
+(1, '2024-11-04 07:00:15', 120, 'com.apple.Health'),
+(1, '2024-11-04 07:30:15', 150, 'com.apple.Health'),
+(1, '2024-11-04 07:59:45', 165, 'com.apple.Health'),
+(2, '2024-11-05 06:30:30', 115, 'com.fitbit.app'),
+(2, '2024-11-05 06:50:30', 145, 'com.fitbit.app'),
+(2, '2024-11-05 07:10:30', 155, 'com.fitbit.app');
