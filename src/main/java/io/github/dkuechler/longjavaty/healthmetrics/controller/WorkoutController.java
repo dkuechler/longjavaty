@@ -36,25 +36,29 @@ public class WorkoutController {
     }
 
     @PostMapping
-    public ResponseEntity<WorkoutResponse> recordWorkout(@Valid @RequestBody WorkoutRequest request) {
+    public ResponseEntity<List<WorkoutResponse>> recordWorkout(@Valid @RequestBody List<@Valid WorkoutRequest> requests) {
         try {
-            Workout saved = workoutService.recordWorkout(
-                request.userId(),
-                request.workoutType(),
-                request.externalId(),
-                request.startTime(),
-                request.endTime(),
-                request.durationSeconds(),
-                request.activeDurationSeconds(),
-                request.caloriesBurned(),
-                request.distanceMeters(),
-                request.avgHeartRate(),
-                request.maxHeartRate(),
-                request.minHeartRate(),
-                request.routeAvailable(),
-                request.sourceId()
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(WorkoutResponse.from(saved));
+            List<WorkoutResponse> saved = requests.stream()
+                .map(request -> WorkoutResponse.from(
+                    workoutService.recordWorkout(
+                        request.userId(),
+                        request.workoutType(),
+                        request.externalId(),
+                        request.startTime(),
+                        request.endTime(),
+                        request.durationSeconds(),
+                        request.activeDurationSeconds(),
+                        request.caloriesBurned(),
+                        request.distanceMeters(),
+                        request.avgHeartRate(),
+                        request.maxHeartRate(),
+                        request.minHeartRate(),
+                        request.routeAvailable(),
+                        request.sourceId()
+                    )
+                ))
+                .toList();
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DataIntegrityViolationException e) {
@@ -80,11 +84,13 @@ public class WorkoutController {
 
     @PostMapping("/metrics/heart-rate")
     public ResponseEntity<List<WorkoutHeartRateSampleResponse>> recordHeartRateSamples(
-        @Valid @RequestBody WorkoutHeartRateSamplesRequest request
+        @Valid @RequestBody List<@Valid WorkoutHeartRateSamplesRequest> requests
     ) {
         try {
-            List<WorkoutHeartRateSample> samples = workoutService.recordHeartRateSamples(request.userId(), request.workoutId(), request.samples());
-            List<WorkoutHeartRateSampleResponse> response = samples.stream().map(WorkoutHeartRateSampleResponse::from).toList();
+            List<WorkoutHeartRateSample> savedSamples = requests.stream()
+                .flatMap(req -> workoutService.recordHeartRateSamples(req.userId(), req.workoutId(), req.samples()).stream())
+                .toList();
+            List<WorkoutHeartRateSampleResponse> response = savedSamples.stream().map(WorkoutHeartRateSampleResponse::from).toList();
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
