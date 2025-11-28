@@ -24,11 +24,34 @@ public class WorkoutService {
     }
 
     @Transactional
-    public Workout recordWorkout(UUID userId, String workoutType, OffsetDateTime startTime, Integer durationSeconds,
-                                 Double caloriesBurned, Double distanceMeters, String sourceId) {
+    public Workout recordWorkout(UUID userId, String workoutType, String externalId, OffsetDateTime startTime, OffsetDateTime endTime,
+                                 Integer durationSeconds, Integer activeDurationSeconds, Double caloriesBurned, Double distanceMeters,
+                                 Integer avgHeartRate, Integer maxHeartRate, Integer minHeartRate, Boolean routeAvailable, String sourceId) {
         AppUser user = findUser(userId);
         OffsetDateTime timestamp = startTime != null ? startTime : OffsetDateTime.now();
-        Workout workout = new Workout(user, workoutType, timestamp, durationSeconds, caloriesBurned, distanceMeters, sourceId);
+        OffsetDateTime resolvedEndTime = endTime;
+        if (resolvedEndTime == null && durationSeconds != null) {
+            resolvedEndTime = timestamp.plusSeconds(durationSeconds);
+        }
+        Integer resolvedActiveDuration = activeDurationSeconds != null ? activeDurationSeconds : durationSeconds;
+        boolean resolvedRouteAvailable = routeAvailable != null && routeAvailable;
+
+        Workout workout = new Workout(
+            user,
+            workoutType,
+            externalId,
+            timestamp,
+            resolvedEndTime,
+            durationSeconds,
+            resolvedActiveDuration,
+            caloriesBurned,
+            distanceMeters,
+            avgHeartRate,
+            maxHeartRate,
+            minHeartRate,
+            resolvedRouteAvailable,
+            sourceId
+        );
         return workoutRepository.save(workout);
     }
 
