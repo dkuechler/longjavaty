@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public record WorkoutHeartRateSamplesRequest(
     @NotNull UUID userId,
-    @NotBlank String workoutId,
+    @NotNull String workoutId,
     @NotEmpty List<@Valid HeartRateSampleDto> samples
 ) {
     public record HeartRateSampleDto(
