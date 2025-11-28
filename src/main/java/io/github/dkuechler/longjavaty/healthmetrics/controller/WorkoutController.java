@@ -38,17 +38,24 @@ public class WorkoutController {
             Workout saved = workoutService.recordWorkout(
                 request.userId(),
                 request.workoutType(),
+                request.externalId(),
                 request.startTime(),
+                request.endTime(),
                 request.durationSeconds(),
+                request.activeDurationSeconds(),
                 request.caloriesBurned(),
                 request.distanceMeters(),
+                request.avgHeartRate(),
+                request.maxHeartRate(),
+                request.minHeartRate(),
+                request.routeAvailable(),
                 request.sourceId()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(WorkoutResponse.from(saved));
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Workout already recorded for this source");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Workout already recorded for this workoutId");
         }
     }
 
