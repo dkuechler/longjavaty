@@ -18,9 +18,9 @@ INSERT INTO measurement (user_id, measurement_type, value_numeric, recorded_at, 
 ('550e8400-e29b-41d4-a716-446655440001', 'STEPS', 15234, '2024-11-05 09:30:00', 'fitbit_steps_1'),
 ('550e8400-e29b-41d4-a716-446655440001', 'VO2_MAX', 38.5, '2024-11-04 07:45:00', 'fitbit_vo2_1');
 
-INSERT INTO workout (user_id, workout_type, external_id, start_time, end_time, duration_seconds, active_duration_seconds, calories_burned, distance_meters, avg_heart_rate, max_heart_rate, min_heart_rate, route_available, source_id) VALUES
-('550e8400-e29b-41d4-a716-446655440000', 'RUN', 'apple_run_1', '2024-11-04 07:00:00', '2024-11-04 08:00:00', 3600, 3500, 650, 10000, 150, 170, 120, TRUE, 'com.apple.Health'),
-('550e8400-e29b-41d4-a716-446655440001', 'CYCLE', 'fitbit_cycle_1', '2024-11-05 06:30:00', '2024-11-05 07:15:00', 2700, 2600, 500, 15000, 140, 160, 110, FALSE, 'com.fitbit.app');
+INSERT INTO workout (id, user_id, workout_type, external_id, start_time, end_time, duration_seconds, active_duration_seconds, calories_burned, distance_meters, avg_heart_rate, max_heart_rate, min_heart_rate, route_available, source_id) VALUES
+('1', '550e8400-e29b-41d4-a716-446655440000', 'RUN', 'apple_run_1', '2024-11-04 07:00:00', '2024-11-04 08:00:00', 3600, 3500, 650, 10000, 150, 170, 120, TRUE, 'com.apple.Health'),
+('2', '550e8400-e29b-41d4-a716-446655440001', 'CYCLE', 'fitbit_cycle_1', '2024-11-05 06:30:00', '2024-11-05 07:15:00', 2700, 2600, 500, 15000, 140, 160, 110, FALSE, 'com.fitbit.app');
 
 INSERT INTO workout_heart_rate_sample (workout_id, sample_time, bpm, source_id) VALUES
 (1, '2024-11-04 07:00:15', 120, 'com.apple.Health'),
