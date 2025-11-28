@@ -1,8 +1,11 @@
 package io.github.dkuechler.longjavaty.healthmetrics.controller;
 
+import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutHeartRateSampleResponse;
+import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutHeartRateSamplesRequest;
 import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutRequest;
 import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutResponse;
 import io.github.dkuechler.longjavaty.healthmetrics.model.Workout;
+import io.github.dkuechler.longjavaty.healthmetrics.model.WorkoutHeartRateSample;
 import io.github.dkuechler.longjavaty.healthmetrics.service.WorkoutService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -69,6 +72,36 @@ public class WorkoutController {
             return workoutService.listWorkouts(userId, from, to)
                 .stream()
                 .map(WorkoutResponse::from)
+                .toList();
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping("/metrics/heart-rate")
+    public ResponseEntity<List<WorkoutHeartRateSampleResponse>> recordHeartRateSamples(
+        @Valid @RequestBody WorkoutHeartRateSamplesRequest request
+    ) {
+        try {
+            List<WorkoutHeartRateSample> samples = workoutService.recordHeartRateSamples(request.userId(), request.workoutId(), request.samples());
+            List<WorkoutHeartRateSampleResponse> response = samples.stream().map(WorkoutHeartRateSampleResponse::from).toList();
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Heart rate samples already recorded for this timestamp/source");
+        }
+    }
+
+    @GetMapping("/metrics/heart-rate")
+    public List<WorkoutHeartRateSampleResponse> getHeartRateSamples(
+        @RequestParam UUID userId,
+        @RequestParam String workoutId
+    ) {
+        try {
+            return workoutService.listHeartRateSamples(userId, workoutId)
+                .stream()
+                .map(WorkoutHeartRateSampleResponse::from)
                 .toList();
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());

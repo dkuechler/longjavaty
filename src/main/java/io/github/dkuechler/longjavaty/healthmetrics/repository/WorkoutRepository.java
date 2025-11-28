@@ -21,4 +21,7 @@ public interface WorkoutRepository extends JpaRepository<Workout, Long> {
         @Param("from") OffsetDateTime from,
         @Param("to") OffsetDateTime to
     );
+
+    @Query("SELECT w FROM Workout w WHERE w.user.id = :userId AND w.externalId = :externalId")
+    Workout findByUserIdAndExternalId(@Param("userId") UUID userId, @Param("externalId") String externalId);
 }
