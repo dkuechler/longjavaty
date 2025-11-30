@@ -11,10 +11,13 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, UserSynchronizationFilter userSynchronizationFilter)
+            throws Exception {
         http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .oauth2ResourceServer(
-                        oauth2 -> oauth2.jwt(org.springframework.security.config.Customizer.withDefaults()));
+                        oauth2 -> oauth2.jwt(org.springframework.security.config.Customizer.withDefaults()))
+                .addFilterAfter(userSynchronizationFilter,
+                        org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 }
