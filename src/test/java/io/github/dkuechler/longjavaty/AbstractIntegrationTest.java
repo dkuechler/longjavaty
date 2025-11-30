@@ -8,8 +8,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Base test class that provides PostgreSQL test container for integration tests.
- * All integration tests should extend this class to ensure consistent test environment.
+ * Base test class that provides PostgreSQL test container for integration
+ * tests.
+ * All integration tests should extend this class to ensure consistent test
+ * environment.
  */
 @SpringBootTest
 @Testcontainers
@@ -20,7 +22,7 @@ public abstract class AbstractIntegrationTest {
             .withDatabaseName("testdb")
             .withUsername("test")
             .withPassword("test")
-            .withReuse(true); // Reuse container across test classes for faster execution
+            .withReuse(true);
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {

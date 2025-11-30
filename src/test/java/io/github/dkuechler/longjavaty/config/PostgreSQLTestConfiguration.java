@@ -9,7 +9,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * Test configuration that provides PostgreSQL via Testcontainers when Docker is available.
+ * Test configuration that provides PostgreSQL via Testcontainers when Docker is
+ * available.
  * 
  * To use this configuration:
  * 1. Make sure Docker is running
@@ -19,17 +20,19 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration
 @Profile("testcontainers")
 public class PostgreSQLTestConfiguration {
-    
+
     private static PostgreSQLContainer<?> postgres;
-    
+
     static {
-        postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:15-alpine"))
+        @SuppressWarnings("resource")
+        PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:15-alpine"))
                 .withDatabaseName("testdb")
-                .withUsername("test") 
+                .withUsername("test")
                 .withPassword("test")
                 .withReuse(true);
+        postgres = container;
     }
-    
+
     @Bean
     public PostgreSQLContainer<?> postgresContainer() {
         if (!postgres.isRunning()) {
@@ -37,7 +40,7 @@ public class PostgreSQLTestConfiguration {
         }
         return postgres;
     }
-    
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         if (postgres != null && postgres.isRunning()) {
