@@ -22,6 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/measurements")
@@ -34,15 +35,17 @@ public class MeasurementController {
     }
 
     @PostMapping
-    public ResponseEntity<MeasurementResponse> recordMeasurement(@Valid @RequestBody MeasurementRequest request) {
+    public ResponseEntity<MeasurementResponse> recordMeasurement(
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
+            @Valid @RequestBody MeasurementRequest request) {
+        UUID userId = UUID.fromString(jwt.getSubject());
         try {
             Measurement saved = measurementService.recordMeasurement(
-                request.userId(),
-                request.measurementType(),
-                request.value(),
-                request.recordedAt(),
-                request.sourceId()
-            );
+                    userId,
+                    request.measurementType(),
+                    request.value(),
+                    request.recordedAt(),
+                    request.sourceId());
             return ResponseEntity.status(HttpStatus.CREATED).body(MeasurementResponse.from(saved));
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
@@ -53,16 +56,16 @@ public class MeasurementController {
 
     @GetMapping
     public List<MeasurementResponse> getMeasurements(
-        @RequestParam UUID userId,
-        @RequestParam MeasurementType measurementType,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to
-    ) {
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
+            @RequestParam MeasurementType measurementType,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to) {
+        UUID userId = UUID.fromString(jwt.getSubject());
         try {
             return measurementService.findMeasurements(userId, measurementType, from, to)
-                .stream()
-                .map(MeasurementResponse::from)
-                .toList();
+                    .stream()
+                    .map(MeasurementResponse::from)
+                    .toList();
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }

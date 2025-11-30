@@ -45,7 +45,7 @@ public class WorkoutController {
             List<WorkoutResponse> saved = requests.stream()
                     .map(request -> WorkoutResponse.from(
                             workoutService.recordWorkout(
-                                    userId, // Use authenticated user ID
+                                    userId,
                                     request.workoutType(),
                                     request.externalId(),
                                     request.startTime(),
