@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +24,7 @@ class AppUserRepositoryTest {
     void findByEmail_ShouldWork() {
         // Given
         AppUser user = new AppUser("test@example.com");
+        user.setId(UUID.randomUUID());
         entityManager.persistAndFlush(user);
 
         // When
@@ -37,6 +39,7 @@ class AppUserRepositoryTest {
     void existsByEmail_ShouldWork() {
         // Given
         AppUser user = new AppUser("test@example.com");
+        user.setId(UUID.randomUUID());
         entityManager.persistAndFlush(user);
 
         // When & Then
