@@ -35,7 +35,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.1
-    container_name: jbench-keycloak
+    container_name: longjavaty-keycloak
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
