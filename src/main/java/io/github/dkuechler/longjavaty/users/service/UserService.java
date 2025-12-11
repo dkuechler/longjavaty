@@ -63,9 +63,8 @@ public class UserService {
                 .map(WorkoutResponse::from)
                 .toList();
         
-        List<MeasurementResponse> measurements = measurementRepository.findAll()
+        List<MeasurementResponse> measurements = measurementRepository.findByUserId(userId)
                 .stream()
-                .filter(m -> m.getUser().getId().equals(userId))
                 .map(MeasurementResponse::from)
                 .toList();
         
