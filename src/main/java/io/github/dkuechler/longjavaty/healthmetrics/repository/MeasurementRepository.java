@@ -29,6 +29,9 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     @Query("SELECT m FROM Measurement m WHERE m.user.id = :userId AND m.measurementType = :measurementType ORDER BY m.timestamp DESC LIMIT 1")
     Measurement findLatestByUserAndMeasurementType(@Param("userId") UUID userId, @Param("measurementType") MeasurementType measurementType);
 
+    @Query("SELECT m FROM Measurement m WHERE m.user.id = :userId ORDER BY m.timestamp DESC")
+    List<Measurement> findByUserId(@Param("userId") UUID userId);
+
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Measurement m WHERE m.user.id = :userId")
     void deleteAllByUserId(@Param("userId") UUID userId);
