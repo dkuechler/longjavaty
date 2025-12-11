@@ -2,6 +2,7 @@ package io.github.dkuechler.longjavaty.healthmetrics.repository;
 
 import io.github.dkuechler.longjavaty.healthmetrics.model.Workout;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,8 @@ public interface WorkoutRepository extends JpaRepository<Workout, Long> {
 
     @Query("SELECT w FROM Workout w WHERE w.user.id = :userId AND w.externalId = :externalId")
     Workout findByUserIdAndExternalId(@Param("userId") UUID userId, @Param("externalId") String externalId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM Workout w WHERE w.user.id = :userId")
+    void deleteAllByUserId(@Param("userId") UUID userId);
 }
