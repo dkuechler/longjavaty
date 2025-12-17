@@ -3,18 +3,21 @@ package io.github.dkuechler.longjavaty.users.service;
 import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.MeasurementResponse;
 import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutResponse;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.MeasurementRepository;
+import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutHeartRateSampleRepository;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutRepository;
 import io.github.dkuechler.longjavaty.users.controller.dto.UserDataExport;
 import io.github.dkuechler.longjavaty.users.model.AppUser;
 import io.github.dkuechler.longjavaty.users.repository.AppUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -24,17 +27,22 @@ public class UserService {
     private final AppUserRepository appUserRepository;
     private final WorkoutRepository workoutRepository;
     private final MeasurementRepository measurementRepository;
+    private final WorkoutHeartRateSampleRepository workoutHeartRateSampleRepository;
 
     public UserService(AppUserRepository appUserRepository,
                       WorkoutRepository workoutRepository,
-                      MeasurementRepository measurementRepository) {
+                      MeasurementRepository measurementRepository,
+                      WorkoutHeartRateSampleRepository workoutHeartRateSampleRepository) {
         this.appUserRepository = appUserRepository;
         this.workoutRepository = workoutRepository;
         this.measurementRepository = measurementRepository;
+        this.workoutHeartRateSampleRepository = workoutHeartRateSampleRepository;
     }
 
     @Transactional
-    public AppUser getOrCreateUser(UUID id, String email) {
+    public AppUser getOrCreateUser(@NonNull UUID id, @NonNull String email) {
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(email, "email");
         return appUserRepository.findById(id)
                 .orElseGet(() -> {
                     AppUser newUser = new AppUser(email);
@@ -52,7 +60,8 @@ public class UserService {
      * @throws NoSuchElementException if user doesn't exist
      */
     @Transactional(readOnly = true)
-    public UserDataExport exportUserData(UUID userId) {
+    public UserDataExport exportUserData(@NonNull UUID userId) {
+        Objects.requireNonNull(userId, "userId");
         log.info("GDPR data export request for user: {}", userId);
         
         AppUser user = appUserRepository.findById(userId)
@@ -90,13 +99,18 @@ public class UserService {
      * @return true if user was found and deleted, false if user didn't exist
      */
     @Transactional
-    public boolean deleteUserAndAllData(UUID userId) {
+    public boolean deleteUserAndAllData(@NonNull UUID userId) {
+        Objects.requireNonNull(userId, "userId");
         log.info("GDPR deletion request for user: {}", userId);
         
         boolean existed = appUserRepository.existsById(userId);
         
         if (existed) {
-            // This will cascade delete all related data due to ON DELETE CASCADE constraints
+            // Do not rely solely on DB-level cascade rules.
+            // Explicitly delete dependent rows so this works consistently across environments (H2, Postgres, etc).
+            workoutHeartRateSampleRepository.deleteAllByUserId(userId);
+            workoutRepository.deleteAllByUserId(userId);
+            measurementRepository.deleteAllByUserId(userId);
             appUserRepository.deleteById(userId);
             log.info("Successfully deleted user and all associated data: {}", userId);
             return true;
