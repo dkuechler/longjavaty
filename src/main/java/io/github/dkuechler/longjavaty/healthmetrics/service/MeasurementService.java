@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class MeasurementService {
 
     private final MeasurementRepository measurementRepository;
@@ -50,6 +51,9 @@ public class MeasurementService {
 
     private AppUser findUser(UUID userId) {
         return appUserRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+            .orElseThrow(() -> {
+                log.error("User lookup failed for ID: {}", userId);
+                return new NoSuchElementException("User not found: " + userId);
+            });
     }
 }
