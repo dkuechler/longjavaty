@@ -26,6 +26,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/measurements")
+@lombok.extern.slf4j.Slf4j
 public class MeasurementController {
 
     private final MeasurementService measurementService;
@@ -39,6 +40,8 @@ public class MeasurementController {
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
             @Valid @RequestBody MeasurementRequest request) {
         UUID userId = UUID.fromString(jwt.getSubject());
+        log.info("Received measurement request for user: {}, type: {}", userId, request.measurementType());
+        
         try {
             Measurement saved = measurementService.recordMeasurement(
                     userId,
@@ -46,10 +49,13 @@ public class MeasurementController {
                     request.value(),
                     request.recordedAt(),
                     request.sourceId());
+            log.debug("Successfully recorded measurement: {}", saved.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(MeasurementResponse.from(saved));
         } catch (NoSuchElementException e) {
+            log.warn("Failed to record measurement - user not found: {}", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (DataIntegrityViolationException e) {
+            log.warn("Duplicate measurement attempt for user: {} and source: {}", userId, request.sourceId());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Measurement already recorded for this source");
         }
     }
@@ -61,6 +67,7 @@ public class MeasurementController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to) {
         UUID userId = UUID.fromString(jwt.getSubject());
+        log.info("Fetching measurements for user: {}, type: {}, range: {} to {}", userId, measurementType, from, to);
         try {
             return measurementService.findMeasurements(userId, measurementType, from, to)
                     .stream()
