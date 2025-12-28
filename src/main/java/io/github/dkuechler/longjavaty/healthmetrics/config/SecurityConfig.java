@@ -14,7 +14,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, UserSynchronizationFilter userSynchronizationFilter)
             throws Exception {
         http.cors(org.springframework.security.config.Customizer.withDefaults())
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(org.springframework.security.config.Customizer.withDefaults()))
                 .addFilterAfter(userSynchronizationFilter,
