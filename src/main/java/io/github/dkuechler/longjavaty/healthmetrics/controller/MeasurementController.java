@@ -40,7 +40,7 @@ public class MeasurementController {
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
             @Valid @RequestBody MeasurementRequest request) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        log.info("Received measurement request for user: {}, type: {}", userId, request.measurementType());
+        log.debug("Received measurement request for user: {}, type: {}", userId, request.measurementType());
         
         try {
             Measurement saved = measurementService.recordMeasurement(
@@ -67,7 +67,7 @@ public class MeasurementController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        log.info("Fetching measurements for user: {}, type: {}, range: {} to {}", userId, measurementType, from, to);
+        log.debug("Fetching measurements for user: {}, type: {}, range: {} to {}", userId, measurementType, from, to);
         try {
             return measurementService.findMeasurements(userId, measurementType, from, to)
                     .stream()
