@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
-@lombok.extern.slf4j.Slf4j
 public class MeasurementService {
 
     private final MeasurementRepository measurementRepository;

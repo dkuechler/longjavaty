@@ -41,7 +41,6 @@ public class MeasurementController {
             @Valid @RequestBody MeasurementRequest request) {
         UUID userId = UUID.fromString(jwt.getSubject());
         log.debug("Received measurement request for user: {}, type: {}", userId, request.measurementType());
-        
         try {
             Measurement saved = measurementService.recordMeasurement(
                     userId,
