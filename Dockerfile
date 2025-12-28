@@ -27,8 +27,7 @@ RUN groupadd -r spring && useradd -r -g spring -d /app -s /bin/false spring
 RUN mkdir -p /app/logs && chown -R spring:spring /app
 
 # Copy the deterministic build artifact
-COPY --from=builder /app/target/longjavaty.jar app.jar
-RUN chown spring:spring app.jar
+COPY --from=builder --chown=spring:spring /app/target/longjavaty.jar app.jar
 
 USER spring
 
