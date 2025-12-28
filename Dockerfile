@@ -19,11 +19,15 @@ RUN ./mvnw clean package -DskipTests -B
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Setup non-root user
-RUN addgroup --system --gid 1001 spring && \
-    adduser --system --uid 1001 --ingroup spring --shell /bin/false spring
+# Setup non-root user (using standard useradd/groupadd for portability)
+# We ensure valid shell is /bin/false and home dir is /app
+RUN groupadd -r spring && useradd -r -g spring -d /app -s /bin/false spring
 
-COPY --from=builder /app/target/*.jar app.jar
+# Create writable directory for logs/temp if needed
+RUN mkdir -p /app/logs && chown -R spring:spring /app
+
+# Copy the deterministic build artifact
+COPY --from=builder /app/target/longjavaty.jar app.jar
 RUN chown spring:spring app.jar
 
 USER spring
