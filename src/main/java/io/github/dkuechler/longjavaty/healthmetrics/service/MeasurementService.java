@@ -19,10 +19,12 @@ public class MeasurementService {
 
     private final MeasurementRepository measurementRepository;
     private final AppUserRepository appUserRepository;
+    private final io.micrometer.core.instrument.MeterRegistry meterRegistry;
 
-    public MeasurementService(MeasurementRepository measurementRepository, AppUserRepository appUserRepository) {
+    public MeasurementService(MeasurementRepository measurementRepository, AppUserRepository appUserRepository, io.micrometer.core.instrument.MeterRegistry meterRegistry) {
         this.measurementRepository = measurementRepository;
         this.appUserRepository = appUserRepository;
+        this.meterRegistry = meterRegistry;
     }
 
     @Transactional
@@ -30,7 +32,13 @@ public class MeasurementService {
         AppUser user = findUser(userId);
         OffsetDateTime timestamp = recordedAt != null ? recordedAt : OffsetDateTime.now();
         Measurement measurement = new Measurement(user, type, value, timestamp, sourceId);
-        return measurementRepository.save(measurement);
+        
+        Measurement saved = measurementRepository.save(measurement);
+        
+        // Custom Metric: Count measurements by type
+        meterRegistry.counter("measurement.recorded", "type", type.name()).increment();
+        
+        return saved;
     }
 
     @Transactional(readOnly = true)
