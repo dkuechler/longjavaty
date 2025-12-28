@@ -59,9 +59,6 @@ public class MeasurementService {
 
     private AppUser findUser(UUID userId) {
         return appUserRepository.findById(userId)
-            .orElseThrow(() -> {
-                log.error("User lookup failed for ID: {}", userId);
-                return new NoSuchElementException("User not found: " + userId);
-            });
+            .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
     }
 }
