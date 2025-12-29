@@ -28,9 +28,7 @@ Create a ".env" file (or export env vars) for Compose:
 
 	docker compose up --build
 
-* API: http://localhost:8080
-* Keycloak (dev): http://localhost:8081
-
+The application will be available on the configured port (default: 8080).
 PostgreSQL is initialized from "src/main/resources/schema.sql" + "src/main/resources/data.sql".
 
 ## Deploy notes (AWS)
@@ -47,11 +45,9 @@ Prod setup:
 
 ## Security
 
-* Every request is authenticated.
-* The backend validates bearer tokens via the configured Keycloak issuer.
-* On authenticated requests, a filter synchronizes the current user into the local DB (creates the user row on first request).
-
-Default local configuration points at a Keycloak realm named "longjavaty-realm".
+* Every request is authenticated via JWT bearer tokens.
+* The backend validates tokens against the configured Keycloak issuer.
+* On authenticated requests, a filter synchronizes the current user into the local DB (JIT provisioning).
 
 ## API
 
@@ -66,14 +62,26 @@ Base path: /api
 * GET /users/me/data: export all user data
 * DELETE /users/me/data: delete user + all stored data
 
-## Run without Docker
+### API Documentation (Development)
+
+When running the application with the dev profile, OpenAPI/Swagger UI is available for interactive API exploration.
+
+- Swagger UI: `/swagger-ui/index.html`
+- OpenAPI spec: `/v3/api-docs`
+
+Enable via:
+```bash
+SPRING_PROFILES_ACTIVE=dev
+```
+
+## Local Development
 
 You'll need a PostgreSQL database + a JWT issuer (Keycloak or equivalent).
 
 
 	./mvnw spring-boot:run
 
-Runtime configuration is primarily in "src/main/resources/application.properties".
+Runtime configuration is in "src/main/resources/application.properties".
 
 ## Tests
 
@@ -83,7 +91,3 @@ Runtime configuration is primarily in "src/main/resources/application.properties
 Integration tests (same as CI):
 
 	./mvnw -Pintegration-tests verify
-
-## License
-
-MIT. See "LICENSE".
