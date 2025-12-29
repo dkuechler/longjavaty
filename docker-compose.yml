@@ -25,6 +25,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
+      # Exposed on 5433 to avoid conflicts with local PostgreSQL instances on default 5432
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data

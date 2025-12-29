@@ -48,6 +48,7 @@ public class UserController {
     @GetMapping("/me/data")
     @Operation(summary = "Export user data", description = "Exports all user data in JSON format (GDPR Right to Data Portability).")
     @ApiResponse(responseCode = "200", description = "User data export")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - missing or invalid JWT token")
     @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<UserDataExport> exportMyData(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());
@@ -77,6 +78,7 @@ public class UserController {
     @DeleteMapping("/me/data")
     @Operation(summary = "Delete account", description = "Permanently deletes user account and all associated data (GDPR Right to Erasure). This operation is irreversible.")
     @ApiResponse(responseCode = "204", description = "Account deleted successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - missing or invalid JWT token")
     @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<Void> deleteMyAccount(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());

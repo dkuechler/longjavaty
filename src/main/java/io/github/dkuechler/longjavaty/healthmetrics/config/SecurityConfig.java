@@ -15,6 +15,7 @@ public class SecurityConfig {
             throws Exception {
         http.cors(org.springframework.security.config.Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
+                        // Public endpoints for monitoring and API documentation (docs disabled in prod via properties)
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/prometheus", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(

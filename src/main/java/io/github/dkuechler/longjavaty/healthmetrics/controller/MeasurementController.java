@@ -42,6 +42,8 @@ public class MeasurementController {
     @PostMapping
     @Operation(summary = "Record a measurement", description = "Records a new health measurement type (e.g. HEART_RATE, WEIGHT) for the authenticated user.")
     @ApiResponse(responseCode = "201", description = "Measurement recorded successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - missing or invalid JWT token")
+    @ApiResponse(responseCode = "404", description = "User not found")
     @ApiResponse(responseCode = "409", description = "Measurement already exists for this source")
     public ResponseEntity<MeasurementResponse> recordMeasurement(
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
@@ -69,6 +71,8 @@ public class MeasurementController {
     @GetMapping
     @Operation(summary = "Get measurements", description = "Retrieves measurements filtered by type and optional date range.")
     @ApiResponse(responseCode = "200", description = "List of measurements")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - missing or invalid JWT token")
+    @ApiResponse(responseCode = "404", description = "User not found")
     public List<MeasurementResponse> getMeasurements(
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
             @RequestParam MeasurementType measurementType,
