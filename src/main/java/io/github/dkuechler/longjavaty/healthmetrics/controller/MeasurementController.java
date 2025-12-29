@@ -22,11 +22,15 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/measurements")
 @lombok.extern.slf4j.Slf4j
+@Tag(name = "Measurements", description = "Operations for recording and retrieving health measurements")
 public class MeasurementController {
 
     private final MeasurementService measurementService;
@@ -36,6 +40,9 @@ public class MeasurementController {
     }
 
     @PostMapping
+    @Operation(summary = "Record a measurement", description = "Records a new health measurement type (e.g. HEART_RATE, WEIGHT) for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Measurement recorded successfully")
+    @ApiResponse(responseCode = "409", description = "Measurement already exists for this source")
     public ResponseEntity<MeasurementResponse> recordMeasurement(
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
             @Valid @RequestBody MeasurementRequest request) {
@@ -60,6 +67,8 @@ public class MeasurementController {
     }
 
     @GetMapping
+    @Operation(summary = "Get measurements", description = "Retrieves measurements filtered by type and optional date range.")
+    @ApiResponse(responseCode = "200", description = "List of measurements")
     public List<MeasurementResponse> getMeasurements(
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
             @RequestParam MeasurementType measurementType,

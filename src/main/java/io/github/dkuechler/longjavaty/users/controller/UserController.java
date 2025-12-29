@@ -15,12 +15,17 @@ import org.springframework.http.HttpStatus;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * Controller for user account management operations.
  * Provides GDPR-compliant endpoints for user data management.
  */
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "Users", description = "User account management and GDPR operations")
 public class UserController {
 
     private final UserService userService;
@@ -41,6 +46,9 @@ public class UserController {
      * @return JSON export of all user data
      */
     @GetMapping("/me/data")
+    @Operation(summary = "Export user data", description = "Exports all user data in JSON format (GDPR Right to Data Portability).")
+    @ApiResponse(responseCode = "200", description = "User data export")
+    @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<UserDataExport> exportMyData(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());
         
@@ -67,6 +75,9 @@ public class UserController {
      * @return 204 No Content if deletion successful, 404 if user not found
      */
     @DeleteMapping("/me/data")
+    @Operation(summary = "Delete account", description = "Permanently deletes user account and all associated data (GDPR Right to Erasure). This operation is irreversible.")
+    @ApiResponse(responseCode = "204", description = "Account deleted successfully")
+    @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<Void> deleteMyAccount(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());
         boolean deleted = userService.deleteUserAndAllData(userId);
