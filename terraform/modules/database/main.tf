@@ -1,6 +1,6 @@
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-${var.environment}-rds-sg"
-  description = "Security group for RDS PostgreSQL"
+  description = "RDS security group"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -8,7 +8,6 @@ resource "aws_security_group" "rds" {
     to_port         = 5432
     protocol        = "tcp"
     security_groups = [var.app_security_group_id]
-    description     = "PostgreSQL access from application"
   }
 
   dynamic "ingress" {
@@ -18,7 +17,6 @@ resource "aws_security_group" "rds" {
       to_port     = 5432
       protocol    = "tcp"
       cidr_blocks = var.allowed_cidr_blocks
-      description = "Direct PostgreSQL access from allowed IPs"
     }
   }
 
@@ -30,23 +28,16 @@ resource "aws_security_group" "rds" {
   }
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-rds-sg"
-    Project     = var.project_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.project_name}-${var.environment}-rds-sg"
   }
 }
 
 resource "aws_db_subnet_group" "main" {
-  name        = "${var.project_name}-${var.environment}-db-subnets"
-  description = "RDS subnet group for ${var.project_name}"
-  subnet_ids  = var.subnet_ids
+  name       = "${var.project_name}-${var.environment}-db-subnets"
+  subnet_ids = var.subnet_ids
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-db-subnet-group"
-    Project     = var.project_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.project_name}-${var.environment}-db-subnet-group"
   }
 }
 
@@ -54,7 +45,7 @@ resource "aws_db_instance" "postgres" {
   identifier = "${var.project_name}-${var.environment}-db"
 
   engine         = "postgres"
-  engine_version = "15.4" # pinning minor for stability, consider 15 for auto minor
+  engine_version = "15.4"
   instance_class = var.instance_class
 
   allocated_storage     = var.allocated_storage
@@ -71,19 +62,13 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.rds.id]
   publicly_accessible    = var.publicly_accessible
 
-  # Operability and safety
-  backup_retention_period = var.environment == "prod" ? 30 : 7
+  backup_retention_period = 7
   skip_final_snapshot     = var.environment != "prod"
-  final_snapshot_identifier = var.environment == "prod" ? "${var.project_name}-${var.environment}-final-snapshot-${uuid()}" : null
   multi_az                = var.environment == "prod"
   deletion_protection     = var.environment == "prod"
   auto_minor_version_upgrade = true
-  copy_tags_to_snapshot      = true
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-postgres"
-    Project     = var.project_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.project_name}-${var.environment}-postgres"
   }
 }
