@@ -65,6 +65,6 @@ resource "aws_security_group" "app" {
   }
 
   tags = {
-    Name = "${var.project_name}-app-sg"
+    Name = "${var.project_name}-${var.environment}-app-sg"
   }
 }
