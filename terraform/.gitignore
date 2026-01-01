@@ -22,7 +22,7 @@ terraform.rc
 
 # Terraform directories
 .terraform/
-.terraform.lock.hcl
+# .terraform.lock.hcl SHOULD be committed
 
 # Plan files (may contain sensitive data)
 *.tfplan
