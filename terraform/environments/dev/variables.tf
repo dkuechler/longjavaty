@@ -33,7 +33,17 @@ variable "db_password" {
   sensitive = true
 }
 
+variable "db_publicly_accessible" {
+  type    = bool
+  default = false
+}
+
 variable "db_allowed_cidr_blocks" {
   type    = list(string)
   default = []
+
+  validation {
+    condition     = !contains(var.db_allowed_cidr_blocks, "0.0.0.0/0")
+    error_message = "Do not use 0.0.0.0/0 for DB access."
+  }
 }

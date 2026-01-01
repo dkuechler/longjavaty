@@ -1,5 +1,5 @@
 resource "aws_security_group" "rds" {
-  name        = "${var.project_name}-${var.environment}-rds-sg"
+  name        = "${var.project_name}-rds-sg"
   description = "RDS security group"
   vpc_id      = var.vpc_id
 
@@ -28,24 +28,24 @@ resource "aws_security_group" "rds" {
   }
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-rds-sg"
+    Name = "${var.project_name}-rds-sg"
   }
 }
 
 resource "aws_db_subnet_group" "main" {
-  name       = "${var.project_name}-${var.environment}-db-subnets"
+  name       = "${var.project_name}-db-subnets"
   subnet_ids = var.subnet_ids
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-db-subnet-group"
+    Name = "${var.project_name}-db-subnet-group"
   }
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier = "${var.project_name}-${var.environment}-db"
+  identifier = "${var.project_name}-db"
 
   engine         = "postgres"
-  engine_version = "15.4"
+  engine_version = "15" # Pin major to avoid drift from minor updates
   instance_class = var.instance_class
 
   allocated_storage     = var.allocated_storage
@@ -62,13 +62,13 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.rds.id]
   publicly_accessible    = var.publicly_accessible
 
-  backup_retention_period = 7
+  backup_retention_period = var.environment == "prod" ? 30 : 7
   skip_final_snapshot     = var.environment != "prod"
   multi_az                = var.environment == "prod"
   deletion_protection     = var.environment == "prod"
   auto_minor_version_upgrade = true
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-postgres"
+    Name = "${var.project_name}-postgres"
   }
 }

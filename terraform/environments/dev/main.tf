@@ -7,15 +7,6 @@ terraform {
       version = "~> 5.0"
     }
   }
-
-  # Backend should be configured for team environments
-  # backend "s3" {
-  #   bucket         = "your-terraform-state-bucket"
-  #   key            = "dev/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   dynamodb_table = "terraform-lock-table"
-  #   encrypt        = true
-  # }
 }
 
 provider "aws" {
@@ -45,7 +36,7 @@ module "database" {
   environment  = var.environment
 
   vpc_id     = module.networking.vpc_id
-  subnet_ids = module.networking.public_subnet_ids # Reverting to public subnets per user requirement
+  subnet_ids = module.networking.public_subnet_ids
 
   app_security_group_id = aws_security_group.app.id
   allowed_cidr_blocks   = var.db_allowed_cidr_blocks
@@ -54,8 +45,9 @@ module "database" {
   db_username = var.db_username
   db_password = var.db_password
 
-  instance_class    = "db.t3.micro"
-  allocated_storage = 20
+  instance_class      = "db.t3.micro"
+  allocated_storage   = 20
+  publicly_accessible = var.db_publicly_accessible
 }
 
 resource "aws_security_group" "app" {
@@ -73,6 +65,6 @@ resource "aws_security_group" "app" {
   }
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-app-sg"
+    Name = "${var.project_name}-app-sg"
   }
 }
