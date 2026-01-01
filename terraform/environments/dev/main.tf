@@ -60,31 +60,19 @@ module "database" {
 
 resource "aws_security_group" "app" {
   name        = "${var.project_name}-${var.environment}-app-sg"
-  description = "Security group for application tasks"
+  description = "Application security group"
   vpc_id      = module.networking.vpc_id
 
   revoke_rules_on_delete = true
 
   egress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [module.networking.vpc_cidr]
-    description = "Outbound access to RDS in VPC"
-  }
-
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Outbound HTTPS for container registry and dependencies"
   }
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-app-sg"
-    Project     = var.project_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.project_name}-${var.environment}-app-sg"
   }
 }
