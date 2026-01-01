@@ -62,10 +62,11 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.rds.id]
   publicly_accessible    = var.publicly_accessible
 
-  backup_retention_period = var.environment == "prod" ? 30 : 7
-  skip_final_snapshot     = var.environment != "prod"
-  multi_az                = var.environment == "prod"
-  deletion_protection     = var.environment == "prod"
+  backup_retention_period   = var.environment == "prod" ? 30 : 7
+  skip_final_snapshot       = var.environment != "prod"
+  final_snapshot_identifier = var.environment == "prod" ? "${var.project_name}-${var.environment}-db-final-snapshot" : null
+  multi_az                  = var.environment == "prod"
+  deletion_protection       = var.environment == "prod"
   auto_minor_version_upgrade = true
 
   tags = {
