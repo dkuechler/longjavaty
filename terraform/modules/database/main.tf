@@ -1,5 +1,5 @@
 resource "aws_security_group" "rds" {
-  name        = "${var.project_name}-rds-sg"
+  name        = "${var.project_name}-${var.environment}-rds-sg"
   description = "RDS security group"
   vpc_id      = var.vpc_id
 
@@ -28,21 +28,21 @@ resource "aws_security_group" "rds" {
   }
 
   tags = {
-    Name = "${var.project_name}-rds-sg"
+    Name = "${var.project_name}-${var.environment}-rds-sg"
   }
 }
 
 resource "aws_db_subnet_group" "main" {
-  name       = "${var.project_name}-db-subnets"
+  name       = "${var.project_name}-${var.environment}-db-subnets"
   subnet_ids = var.subnet_ids
 
   tags = {
-    Name = "${var.project_name}-db-subnet-group"
+    Name = "${var.project_name}-${var.environment}-db-subnet-group"
   }
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier = "${var.project_name}-db"
+  identifier = "${var.project_name}-${var.environment}-db"
 
   engine         = "postgres"
   engine_version = "15" # Pin major to avoid drift from minor updates
@@ -69,6 +69,6 @@ resource "aws_db_instance" "postgres" {
   auto_minor_version_upgrade = true
 
   tags = {
-    Name = "${var.project_name}-postgres"
+    Name = "${var.project_name}-${var.environment}-postgres"
   }
 }
