@@ -6,7 +6,7 @@ output "vpc_id" {
 output "database_endpoint" {
   description = "RDS endpoint"
   value       = module.database.db_endpoint
-  # Hostname is generally not considered a secret, improving usability
+  sensitive   = true
 }
 
 output "database_connection_string" {
