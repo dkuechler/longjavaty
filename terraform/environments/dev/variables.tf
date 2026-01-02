@@ -47,3 +47,9 @@ variable "db_allowed_cidr_blocks" {
     error_message = "Do not use 0.0.0.0/0 for DB access."
   }
 }
+
+variable "container_image" {
+  type        = string
+  description = "Docker image for the application"
+  default     = "dkuechler/longjavaty:latest" # Placeholder, user can override
+}
