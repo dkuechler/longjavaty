@@ -61,7 +61,8 @@ resource "aws_ecs_task_definition" "app" {
     environment = [
       { name = "SPRING_DATASOURCE_URL", value = "jdbc:postgresql://${var.db_host}:5432/${var.db_name}" },
       { name = "SPRING_DATASOURCE_USERNAME", value = var.db_username },
-      { name = "SPRING_DATASOURCE_PASSWORD", value = var.db_password }
+      { name = "SPRING_DATASOURCE_PASSWORD", value = var.db_password },
+      { name = "FRONTEND_ORIGINS", value = var.frontend_origins }
     ]
     logConfiguration = {
       logDriver = "awslogs"

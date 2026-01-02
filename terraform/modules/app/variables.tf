@@ -53,3 +53,8 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+
+variable "frontend_origins" {
+  type    = string
+  default = "http://localhost:4200"
+}
