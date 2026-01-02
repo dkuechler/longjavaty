@@ -14,3 +14,11 @@ output "database_connection_string" {
   value       = "jdbc:postgresql://${module.database.db_address}:${module.database.db_port}/${module.database.db_name}"
   sensitive   = true
 }
+
+output "ecs_cluster_name" {
+  value = module.app.cluster_name
+}
+
+output "ecs_service_name" {
+  value = module.app.service_name
+}
