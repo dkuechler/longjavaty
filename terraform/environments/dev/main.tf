@@ -68,6 +68,7 @@ module "app" {
   db_password = var.db_password
 
   frontend_origins = var.frontend_origins
+  spring_profiles  = var.spring_profiles
 }
 
 resource "aws_security_group" "app" {
