@@ -62,5 +62,5 @@ variable "frontend_origins" {
 variable "spring_profiles" {
   type        = string
   description = "Active Spring profiles"
-  default     = "default"
+  default     = "dev"
 }
