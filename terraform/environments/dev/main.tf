@@ -66,6 +66,8 @@ module "app" {
   db_name     = var.db_name
   db_username = var.db_username
   db_password = var.db_password
+
+  frontend_origins = var.frontend_origins
 }
 
 resource "aws_security_group" "app" {

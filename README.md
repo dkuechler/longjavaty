@@ -5,67 +5,40 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen?style=flat-square&logo=spring-boot)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=flat-square&logo=postgresql)
 
-A Spring Boot REST API for tracking health metrics, including workouts, heart rate samples, and body measurements.
+A Spring Boot REST API for tracking health metrics, featuring JIT user synchronization with Keycloak and GDPR-compliant data management.
 
-## Technical Stack
+## Tech Stack
 
-* **Backend:** Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA
-* **Database:** PostgreSQL 15
-* **Auth:** JWT-based authentication via Keycloak
-* **Infrastructure:** Terraform (AWS ECS Fargate, RDS, VPC)
+- **Backend:** Java 21, Spring Boot 3.5, Spring Security, JPA/Hibernate
+- **Database:** PostgreSQL 15
+- **Auth:** OIDC / JWT (Keycloak)
+- **Infrastructure:** AWS (ECS Fargate Spot, RDS, ECR, VPC)
+- **IaC:** Terraform
 
 ## Local Setup
 
-### Prerequesites
-* Docker & Docker Compose
-
-### Running the Stack
-1. Create a `.env` file from `.env.example`.
-2. Start the services:
+1. Copy `.env.example` to `.env` and fill in the values.
+2. Spin up the stack:
    ```bash
    docker compose up --build
    ```
-The API will be available at `http://localhost:8080`.
+The API is available on port `8080`.
 
-## AWS Infrastructure
+## Cloud Infrastructure
 
-The deployment is managed via Terraform in the `terraform/` directory.
+The infrastructure is defined in the [`terraform/`](./terraform) directory.
 
-* **Region:** `eu-central-1`
-* **Network:** VPC with public subnets
-* **Database:** RDS PostgreSQL (t3.micro)
-* **Compute:** ECS Fargate
+- **ECS Fargate:** Task execution using Spot instances for cost savings.
+- **RDS:** Managed PostgreSQL instance.
+- **Networking:** Custom VPC with public subnets and multi-AZ support.
 
-To provision development infrastructure:
-```bash
-cd terraform/environments/dev
-terraform init
-terraform apply
-```
+## Security & GDPR
 
-## Security & API
-
-All endpoints require a valid JWT token issued by Keycloak. User data is synchronized into the local database upon the first authenticated request.
-
-### Documentation
-When running with the `dev` profile, Swagger UI is available at `/swagger-ui/index.html`.
-
-### Endpoints
-* `POST /workouts`: Bulk record workouts
-* `GET /workouts`: List workouts (optional time filters)
-* `POST /workouts/metrics/heart-rate`: Record heart rate data
-* `POST /measurements`: Record body measurements
-* `GET /users/me/data`: GDPR data export
-* `DELETE /users/me/data`: User account deletion
+- **Auth:** Endpoints are protected via JWT. Users are automatically synced to the local database on their first login.
+- **GDPR:** Includes endpoints for data portability (JSON export) and account erasure.
+- **API Docs:** Swagger UI is available at `/swagger-ui/index.html` in the `dev` profile.
 
 ## Testing
 
-Run unit tests:
-```bash
-./mvnw test
-```
-
-Run integration tests:
-```bash
-./mvnw -Pintegration-tests verify
-```
+- **Unit Tests:** `./mvnw test`
+- **Integration Tests:** `./mvnw -Pintegration-tests verify`

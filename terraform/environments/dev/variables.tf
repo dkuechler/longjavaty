@@ -53,3 +53,8 @@ variable "container_image" {
   description = "Docker image for the application. If empty, uses the ECR repository created by the module."
   default     = ""
 }
+
+variable "frontend_origins" {
+  type    = string
+  default = "http://localhost:4200"
+}
