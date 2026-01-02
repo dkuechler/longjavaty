@@ -1,93 +1,71 @@
-# longjavaty-backend
+# longjavaty
 
 [![CI](https://github.com/dkuechler/longjavaty/actions/workflows/ci.yml/badge.svg)](https://github.com/dkuechler/longjavaty/actions/workflows/ci.yml)
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen?style=flat-square&logo=spring-boot)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=flat-square&logo=postgresql)
-![Docker](https://img.shields.io/badge/Docker-Enabled-blue?style=flat-square&logo=docker)
 
-This is a Spring Boot REST API for storing health metrics (workouts + measurements) per user.
-Auth is JWT-based (Keycloak).
+A Spring Boot REST API for tracking health metrics, including workouts, heart rate samples, and body measurements.
 
-## Highlights
+## Technical Stack
 
-* **Stack:** Java 21, Spring Boot 3.5, Spring Security (JWT), Spring Data JPA, PostgreSQL
-* **Local infra:** Docker Compose (app + Postgres + Keycloak)
-* **Domain:** workouts + heart rate samples + measurements
-* **Privacy:** user data export + delete endpoints (GDPR style)
+* **Backend:** Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA
+* **Database:** PostgreSQL 15
+* **Auth:** JWT-based authentication via Keycloak
+* **Infrastructure:** Terraform (AWS ECS Fargate, RDS, VPC)
 
-## Quickstart (Docker)
+## Local Setup
 
-Prereqs: Docker Desktop.
+### Prerequesites
+* Docker & Docker Compose
 
-Create a ".env" file (or export env vars) for Compose:
+### Running the Stack
+1. Create a `.env` file from `.env.example`.
+2. Start the services:
+   ```bash
+   docker compose up --build
+   ```
+The API will be available at `http://localhost:8080`.
 
-* POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
-* FRONTEND_ORIGINS (comma separated)
+## AWS Infrastructure
 
+The deployment is managed via Terraform in the `terraform/` directory.
 
-	docker compose up --build
+* **Region:** `eu-central-1`
+* **Network:** VPC with public subnets
+* **Database:** RDS PostgreSQL (t3.micro)
+* **Compute:** ECS Fargate
 
-The application will be available on the configured port (default: 8080).
-PostgreSQL is initialized from "src/main/resources/schema.sql" + "src/main/resources/data.sql".
-
-## Deploy notes (AWS)
-
-In production I run this as a container (ECS style) and connect it to a managed Postgres database (RDS).
-I do not commit any AWS endpoints or secrets. Prod config is provided via environment variables.
-
-Prod setup:
-
-* Set SPRING_PROFILES_ACTIVE=rds (uses "src/main/resources/application-rds.properties")
-* Provide RDS_DB_HOST, RDS_DB_PORT, RDS_DB_NAME, RDS_DB_USERNAME, RDS_DB_PASSWORD
-* Provide KEYCLOAK_ISSUER_URI and KEYCLOAK_JWK_SET_URI
-* Provide FRONTEND_ORIGINS
-
-## Security
-
-* Every request is authenticated via JWT bearer tokens.
-* The backend validates tokens against the configured Keycloak issuer.
-* On authenticated requests, a filter synchronizes the current user into the local DB (JIT provisioning).
-
-## API
-
-Base path: /api
-
-* POST /workouts: record workouts (bulk)
-* GET /workouts: list workouts (optional "from" / "to" ISO timestamps)
-* POST /workouts/metrics/heart-rate: record heart rate samples for workouts
-* GET /workouts/metrics/heart-rate?workoutId=...: list heart rate samples
-* POST /measurements: record a measurement
-* GET /measurements?measurementType=...: list measurements (optional "from" / "to")
-* GET /users/me/data: export all user data
-* DELETE /users/me/data: delete user + all stored data
-
-### API Documentation (Development)
-
-When running the application with the dev profile, OpenAPI/Swagger UI is available for interactive API exploration.
-
-- Swagger UI: `/swagger-ui/index.html`
-- OpenAPI spec: `/v3/api-docs`
-
-Enable via:
+To provision development infrastructure:
 ```bash
-SPRING_PROFILES_ACTIVE=dev
+cd terraform/environments/dev
+terraform init
+terraform apply
 ```
 
-## Local Development
+## Security & API
 
-You'll need a PostgreSQL database + a JWT issuer (Keycloak or equivalent).
+All endpoints require a valid JWT token issued by Keycloak. User data is synchronized into the local database upon the first authenticated request.
 
+### Documentation
+When running with the `dev` profile, Swagger UI is available at `/swagger-ui/index.html`.
 
-	./mvnw spring-boot:run
+### Endpoints
+* `POST /workouts`: Bulk record workouts
+* `GET /workouts`: List workouts (optional time filters)
+* `POST /workouts/metrics/heart-rate`: Record heart rate data
+* `POST /measurements`: Record body measurements
+* `GET /users/me/data`: GDPR data export
+* `DELETE /users/me/data`: User account deletion
 
-Runtime configuration is in "src/main/resources/application.properties".
+## Testing
 
-## Tests
+Run unit tests:
+```bash
+./mvnw test
+```
 
-
-	./mvnw test
-
-Integration tests (same as CI):
-
-	./mvnw -Pintegration-tests verify
+Run integration tests:
+```bash
+./mvnw -Pintegration-tests verify
+```
