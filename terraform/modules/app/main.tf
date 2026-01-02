@@ -37,30 +37,9 @@ resource "aws_iam_role" "execution" {
 
 resource "aws_iam_role_policy_attachment" "execution" {
   role       = aws_iam_role.execution.name
-  policy_arn = "arn:aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Allow ECS to pull from ECR
-resource "aws_iam_role_policy" "ecr_pull" {
-  name = "${var.project_name}-${var.environment}-ecr-pull"
-  role = aws_iam_role.execution.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage"
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      }
-    ]
-  })
-}
 
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-${var.environment}-task"
