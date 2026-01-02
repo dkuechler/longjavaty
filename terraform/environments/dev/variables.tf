@@ -58,3 +58,8 @@ variable "frontend_origins" {
   type    = string
   default = "http://localhost:4200"
 }
+
+variable "spring_profiles" {
+  type    = string
+  default = "dev"
+}
