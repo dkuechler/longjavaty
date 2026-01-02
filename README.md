@@ -12,7 +12,7 @@ A Spring Boot REST API for tracking health metrics, featuring JIT user synchroni
 - **Backend:** Java 21, Spring Boot 3.5, Spring Security, JPA/Hibernate
 - **Database:** PostgreSQL 15
 - **Auth:** OIDC / JWT (Keycloak)
-- **Infrastructure:** AWS (ECS Fargate Spot, RDS, ECR, VPC)
+- **Infrastructure:** AWS (ECS Fargate, RDS, ECR)
 - **IaC:** Terraform
 
 ## Local Setup
@@ -30,7 +30,7 @@ The infrastructure is defined in the [`terraform/`](./terraform) directory.
 
 - **ECS Fargate:** Task execution using Spot instances for cost savings.
 - **RDS:** Managed PostgreSQL instance.
-- **Networking:** Custom VPC with public subnets and multi-AZ support.
+- **Networking:** Custom VPC with multi-AZ public subnets.
 
 ## Security & GDPR
 
