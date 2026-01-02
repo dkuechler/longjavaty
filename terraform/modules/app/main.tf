@@ -1,3 +1,13 @@
+resource "aws_ecr_repository" "app" {
+  name                 = "${var.project_name}-${var.environment}-app"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-${var.environment}-cluster"
 }
@@ -27,7 +37,29 @@ resource "aws_iam_role" "execution" {
 
 resource "aws_iam_role_policy_attachment" "execution" {
   role       = aws_iam_role.execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Allow ECS to pull from ECR
+resource "aws_iam_role_policy" "ecr_pull" {
+  name = "${var.project_name}-${var.environment}-ecr-pull"
+  role = aws_iam_role.execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -40,7 +72,7 @@ resource "aws_ecs_task_definition" "app" {
 
   container_definitions = jsonencode([{
     name  = "app"
-    image = var.container_image
+    image = var.container_image == "" ? "${aws_ecr_repository.app.repository_url}:latest" : var.container_image
     portMappings = [{ containerPort = var.container_port, hostPort = var.container_port }]
     environment = [
       { name = "SPRING_DATASOURCE_URL", value = "jdbc:postgresql://${var.db_host}:5432/${var.db_name}" },

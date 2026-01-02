@@ -22,3 +22,7 @@ output "ecs_cluster_name" {
 output "ecs_service_name" {
   value = module.app.service_name
 }
+
+output "ecr_repository_url" {
+  value = module.app.ecr_repository_url
+}

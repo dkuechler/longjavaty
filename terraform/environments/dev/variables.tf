@@ -50,6 +50,6 @@ variable "db_allowed_cidr_blocks" {
 
 variable "container_image" {
   type        = string
-  description = "Docker image for the application"
-  default     = "dkuechler/longjavaty:latest" # Placeholder, user can override
+  description = "Docker image for the application. If empty, uses the ECR repository created by the module."
+  default     = ""
 }
