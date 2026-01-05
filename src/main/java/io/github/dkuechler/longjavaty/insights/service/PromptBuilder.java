@@ -87,11 +87,18 @@ public class PromptBuilder {
         if (!data.workoutSummaries().isEmpty()) {
             prompt.append("- Breakdown by type:\n");
             for (WorkoutSummary summary : data.workoutSummaries()) {
-                prompt.append(String.format("  - %s: %d sessions, avg %.0f min, avg HR %.0f bpm%n",
-                    summary.workoutType(),
-                    summary.count(),
-                    summary.avgDurationSeconds() / 60,
-                    summary.avgHeartRate()));
+                if (summary.avgHeartRate() != null) {
+                    prompt.append(String.format("  - %s: %d sessions, avg %.0f min, avg HR %.0f bpm%n",
+                        summary.workoutType(),
+                        summary.count(),
+                        summary.avgDurationSeconds() / 60,
+                        summary.avgHeartRate()));
+                } else {
+                    prompt.append(String.format("  - %s: %d sessions, avg %.0f min%n",
+                        summary.workoutType(),
+                        summary.count(),
+                        summary.avgDurationSeconds() / 60));
+                }
             }
         } else {
             prompt.append("- No workout data recorded\n");

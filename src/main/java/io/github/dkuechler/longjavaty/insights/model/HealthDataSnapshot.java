@@ -34,7 +34,7 @@ public record HealthDataSnapshot(
         String workoutType,
         int count,
         double avgDurationSeconds,
-        double avgHeartRate
+        Double avgHeartRate
     ) {}
 
     public record UserProfile(

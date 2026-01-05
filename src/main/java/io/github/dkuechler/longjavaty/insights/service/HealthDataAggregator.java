@@ -159,13 +159,17 @@ public class HealthDataAggregator {
                     .mapToInt(w -> w.getDurationSeconds() != null ? w.getDurationSeconds() : 0)
                     .average()
                     .orElse(0),
-                entry.getValue().stream()
-                    .filter(w -> w.getAvgHeartRate() != null)
-                    .mapToInt(Workout::getAvgHeartRate)
-                    .average()
-                    .orElse(0)
+                calculateAverageHeartRate(entry.getValue())
             ))
             .toList();
+    }
+
+    private Double calculateAverageHeartRate(List<Workout> workouts) {
+        var average = workouts.stream()
+            .filter(w -> w.getAvgHeartRate() != null)
+            .mapToInt(Workout::getAvgHeartRate)
+            .average();
+        return average.isPresent() ? average.getAsDouble() : null;
     }
 
     private UserProfile buildUserProfile() {
