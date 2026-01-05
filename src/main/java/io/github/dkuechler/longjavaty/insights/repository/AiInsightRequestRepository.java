@@ -14,15 +14,9 @@ import java.util.UUID;
 @Repository
 public interface AiInsightRequestRepository extends JpaRepository<AiInsightRequest, Long> {
 
-    @Query("""
-        SELECT r FROM AiInsightRequest r
-        WHERE r.user.id = :userId AND r.success = true AND r.requestedAt > :since
-        ORDER BY r.requestedAt DESC
-        LIMIT 1
-        """)
-    Optional<AiInsightRequest> findLastSuccessfulRequest(
-        @Param("userId") UUID userId,
-        @Param("since") OffsetDateTime since
+    Optional<AiInsightRequest> findFirstByUser_IdAndSuccessTrueAndRequestedAtAfterOrderByRequestedAtDesc(
+        UUID userId,
+        OffsetDateTime since
     );
 
     @Modifying(clearAutomatically = true)
