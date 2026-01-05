@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class HealthDataAggregator {
 
     private final MeasurementRepository measurementRepository;

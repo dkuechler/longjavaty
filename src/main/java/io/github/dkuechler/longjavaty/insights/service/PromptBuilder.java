@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class PromptBuilder {
 
     public String buildAnalysisPrompt(HealthDataSnapshot data) {

@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class InsightsService {
 
     private static final String SYSTEM_PROMPT = """
