@@ -1,6 +1,7 @@
 package io.github.dkuechler.longjavaty.insights.service;
 
 import io.github.dkuechler.longjavaty.insights.config.AiConfig;
+import io.github.dkuechler.longjavaty.insights.config.InsightsProperties;
 import io.github.dkuechler.longjavaty.insights.controller.dto.HealthInsightResponse;
 import io.github.dkuechler.longjavaty.insights.controller.dto.PromptExportResponse;
 import io.github.dkuechler.longjavaty.insights.controller.dto.RateLimitStatusResponse;
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -33,7 +35,9 @@ public class InsightsService {
     private final AiInsightRequestRepository requestRepository;
     private final AppUserRepository appUserRepository;
     private final AiConfig aiConfig;
+    private final InsightsProperties properties;
     private final MeterRegistry meterRegistry;
+    private final Clock clock;
 
     public InsightsService(ChatClient healthInsightsChatClient,
                            HealthDataAggregator healthDataAggregator,
@@ -41,14 +45,18 @@ public class InsightsService {
                            AiInsightRequestRepository requestRepository,
                            AppUserRepository appUserRepository,
                            AiConfig aiConfig,
-                           MeterRegistry meterRegistry) {
+                           InsightsProperties properties,
+                           MeterRegistry meterRegistry,
+                           Clock insightsClock) {
         this.chatClient = healthInsightsChatClient;
         this.healthDataAggregator = healthDataAggregator;
         this.promptBuilder = promptBuilder;
         this.requestRepository = requestRepository;
         this.appUserRepository = appUserRepository;
         this.aiConfig = aiConfig;
+        this.properties = properties;
         this.meterRegistry = meterRegistry;
+        this.clock = insightsClock;
     }
 
     @Transactional
@@ -57,7 +65,7 @@ public class InsightsService {
         AppUser user = findUserForUpdate(userId);
         checkRateLimit(userId);
 
-        AiInsightRequest request = new AiInsightRequest(user, OffsetDateTime.now());
+        AiInsightRequest request = new AiInsightRequest(user, OffsetDateTime.now(clock));
         requestRepository.save(request);
 
         HealthDataSnapshot snapshot = healthDataAggregator.aggregateHealthData(userId);
@@ -112,7 +120,8 @@ public class InsightsService {
 
     @Transactional(readOnly = true)
     public RateLimitStatusResponse getRateLimitStatus(UUID userId) {
-        OffsetDateTime rateLimitWindow = OffsetDateTime.now().minusDays(aiConfig.getRateLimitDays());
+        OffsetDateTime now = OffsetDateTime.now(clock);
+        OffsetDateTime rateLimitWindow = now.minusDays(properties.rateLimitDays());
 
         Optional<AiInsightRequest> lastRequest = requestRepository
             .findFirstByUser_IdAndSuccessTrueAndRequestedAtAfterOrderByRequestedAtDesc(userId, rateLimitWindow);
@@ -122,8 +131,8 @@ public class InsightsService {
         }
 
         OffsetDateTime lastRequestAt = lastRequest.get().getRequestedAt();
-        OffsetDateTime nextAvailable = lastRequestAt.plusDays(aiConfig.getRateLimitDays());
-        boolean canRequest = OffsetDateTime.now().isAfter(nextAvailable);
+        OffsetDateTime nextAvailable = lastRequestAt.plusDays(properties.rateLimitDays());
+        boolean canRequest = now.isAfter(nextAvailable);
 
         return new RateLimitStatusResponse(
             canRequest,
@@ -132,15 +141,20 @@ public class InsightsService {
         );
     }
 
+    /**
+     * Checks if user has exceeded rate limit.
+     * Policy: Rate limiting is based on SUCCESSFUL requests only, allowing retries
+     * when the AI service fails. Users get 1 successful analysis per rate-limit window.
+     */
     private void checkRateLimit(UUID userId) {
-        OffsetDateTime rateLimitWindow = OffsetDateTime.now().minusDays(aiConfig.getRateLimitDays());
+        OffsetDateTime rateLimitWindow = OffsetDateTime.now(clock).minusDays(properties.rateLimitDays());
 
         Optional<AiInsightRequest> lastRequest = requestRepository
             .findFirstByUser_IdAndSuccessTrueAndRequestedAtAfterOrderByRequestedAtDesc(userId, rateLimitWindow);
 
         if (lastRequest.isPresent()) {
             OffsetDateTime nextAvailable = lastRequest.get().getRequestedAt()
-                .plusDays(aiConfig.getRateLimitDays());
+                .plusDays(properties.rateLimitDays());
             throw new RateLimitExceededException(nextAvailable);
         }
     }

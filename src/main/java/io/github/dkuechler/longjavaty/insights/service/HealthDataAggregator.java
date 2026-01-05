@@ -5,7 +5,7 @@ import io.github.dkuechler.longjavaty.healthmetrics.model.MeasurementType;
 import io.github.dkuechler.longjavaty.healthmetrics.model.Workout;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.MeasurementRepository;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutRepository;
-import io.github.dkuechler.longjavaty.insights.config.AiConfig;
+import io.github.dkuechler.longjavaty.insights.config.InsightsProperties;
 import io.github.dkuechler.longjavaty.insights.model.HealthDataSnapshot;
 import io.github.dkuechler.longjavaty.insights.model.HealthDataSnapshot.Trend;
 import io.github.dkuechler.longjavaty.insights.model.HealthDataSnapshot.UserProfile;
@@ -15,6 +15,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -29,20 +31,23 @@ public class HealthDataAggregator {
 
     private final MeasurementRepository measurementRepository;
     private final WorkoutRepository workoutRepository;
-    private final AiConfig aiConfig;
+    private final InsightsProperties properties;
+    private final Clock clock;
 
     public HealthDataAggregator(MeasurementRepository measurementRepository,
                                 WorkoutRepository workoutRepository,
-                                AiConfig aiConfig) {
+                                InsightsProperties properties,
+                                Clock insightsClock) {
         this.measurementRepository = measurementRepository;
         this.workoutRepository = workoutRepository;
-        this.aiConfig = aiConfig;
+        this.properties = properties;
+        this.clock = insightsClock;
     }
 
     @Transactional(readOnly = true)
     public HealthDataSnapshot aggregateHealthData(UUID userId) {
-        OffsetDateTime now = OffsetDateTime.now();
-        OffsetDateTime windowStart = now.minusDays(aiConfig.getAnalysisWindowDays());
+        OffsetDateTime now = OffsetDateTime.now(clock);
+        OffsetDateTime windowStart = now.minusDays(properties.analysisWindowDays());
 
         List<Measurement> restingHR = measurementRepository
             .findByUserAndMeasurementTypeAndTimestampBetween(
@@ -64,7 +69,7 @@ public class HealthDataAggregator {
 
         return HealthDataSnapshot.builder()
             .userId(userId)
-            .analysisWindowDays(aiConfig.getAnalysisWindowDays())
+            .analysisWindowDays(properties.analysisWindowDays())
             .restingHeartRateTrend(calculateTrend(restingHR))
             .restingHeartRateAvg(calculateAverage(restingHR))
             .restingHeartRateLatest(getLatestValue(restingHR))
@@ -79,6 +84,11 @@ public class HealthDataAggregator {
             .build();
     }
 
+    /**
+     * Calculates trend by comparing first-half vs second-half averages.
+     * This is a simple heuristic; for more robust analysis, consider linear regression.
+     * Threshold: >3% change indicates a trend, otherwise stable.
+     */
     private Trend calculateTrend(List<Measurement> measurements) {
         if (measurements.size() < 3) {
             return Trend.INSUFFICIENT_DATA;
@@ -137,9 +147,9 @@ public class HealthDataAggregator {
         if (steps.isEmpty()) {
             return null;
         }
-        Map<String, Double> dailyTotals = steps.stream()
+        Map<LocalDate, Double> dailyTotals = steps.stream()
             .collect(Collectors.groupingBy(
-                m -> m.getTimestamp().toLocalDate().toString(),
+                m -> m.getTimestamp().toLocalDate(),
                 Collectors.summingDouble(Measurement::getValue)
             ));
         return dailyTotals.values().stream()

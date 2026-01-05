@@ -1,13 +1,16 @@
 package io.github.dkuechler.longjavaty.insights.config;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Clock;
+
 @Configuration
 @ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
+@EnableConfigurationProperties(InsightsProperties.class)
 public class AiConfig {
 
     private static final String SYSTEM_PROMPT = """
@@ -17,12 +20,6 @@ public class AiConfig {
         and sustainable habits. Always consider safety and recommend consulting a \
         healthcare provider for significant changes.""";
 
-    @Value("${app.insights.analysis-window-days:30}")
-    private int analysisWindowDays;
-
-    @Value("${app.insights.rate-limit-days:7}")
-    private int rateLimitDays;
-
     @Bean
     public ChatClient healthInsightsChatClient(ChatClient.Builder builder) {
         return builder
@@ -30,15 +27,12 @@ public class AiConfig {
             .build();
     }
 
+    @Bean
+    public Clock insightsClock() {
+        return Clock.systemUTC();
+    }
+
     public String getSystemPrompt() {
         return SYSTEM_PROMPT;
-    }
-
-    public int getAnalysisWindowDays() {
-        return analysisWindowDays;
-    }
-
-    public int getRateLimitDays() {
-        return rateLimitDays;
     }
 }
