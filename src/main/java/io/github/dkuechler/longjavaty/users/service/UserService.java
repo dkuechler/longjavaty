@@ -5,6 +5,7 @@ import io.github.dkuechler.longjavaty.healthmetrics.controller.dto.WorkoutRespon
 import io.github.dkuechler.longjavaty.healthmetrics.repository.MeasurementRepository;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutHeartRateSampleRepository;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutRepository;
+import io.github.dkuechler.longjavaty.insights.repository.AiInsightRequestRepository;
 import io.github.dkuechler.longjavaty.users.controller.dto.UserDataExport;
 import io.github.dkuechler.longjavaty.users.model.AppUser;
 import io.github.dkuechler.longjavaty.users.repository.AppUserRepository;
@@ -28,15 +29,18 @@ public class UserService {
     private final WorkoutRepository workoutRepository;
     private final MeasurementRepository measurementRepository;
     private final WorkoutHeartRateSampleRepository workoutHeartRateSampleRepository;
+    private final AiInsightRequestRepository aiInsightRequestRepository;
 
     public UserService(AppUserRepository appUserRepository,
                       WorkoutRepository workoutRepository,
                       MeasurementRepository measurementRepository,
-                      WorkoutHeartRateSampleRepository workoutHeartRateSampleRepository) {
+                      WorkoutHeartRateSampleRepository workoutHeartRateSampleRepository,
+                      AiInsightRequestRepository aiInsightRequestRepository) {
         this.appUserRepository = appUserRepository;
         this.workoutRepository = workoutRepository;
         this.measurementRepository = measurementRepository;
         this.workoutHeartRateSampleRepository = workoutHeartRateSampleRepository;
+        this.aiInsightRequestRepository = aiInsightRequestRepository;
     }
 
     @Transactional
@@ -108,6 +112,7 @@ public class UserService {
         if (existed) {
             // Do not rely solely on DB-level cascade rules.
             // Explicitly delete dependent rows so this works consistently across environments (H2, Postgres, etc).
+            aiInsightRequestRepository.deleteAllByUserId(userId);
             workoutHeartRateSampleRepository.deleteAllByUserId(userId);
             workoutRepository.deleteAllByUserId(userId);
             measurementRepository.deleteAllByUserId(userId);
