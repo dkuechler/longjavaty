@@ -44,7 +44,7 @@ class HealthDataAggregatorTest {
 
     @BeforeEach
     void setUp() {
-        properties = new InsightsProperties(30, 7);
+        properties = new InsightsProperties(30, 7, 5, "test-key");
         clock = Clock.fixed(Instant.parse("2024-06-15T10:00:00Z"), ZoneOffset.UTC);
         aggregator = new HealthDataAggregator(measurementRepository, workoutRepository, properties, clock);
         userId = UUID.randomUUID();

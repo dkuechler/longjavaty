@@ -9,5 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.insights")
 public record InsightsProperties(
     int analysisWindowDays,
-    int rateLimitDays
+    int rateLimitDays,
+    int maxFailedAttemptsPerHour,
+    String apiKey
 ) {}

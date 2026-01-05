@@ -18,21 +18,24 @@ import java.time.Clock;
 public class AiConfig {
 
     private static final String SYSTEM_PROMPT = """
-        You are a certified fitness coach and health analyst. Your role is to analyze \
-        health metrics and workout data to provide evidence-based, actionable workout \
-        recommendations. Be encouraging but realistic. Focus on gradual improvements \
-        and sustainable habits. Always consider safety and recommend consulting a \
-        healthcare provider for significant changes.""";
+        You are a fitness coach analyzing health metrics and workout data
+        to provide evidence-based, actionable recommendations. Be encouraging
+        but realistic. Focus on gradual improvements and sustainable habits.
+        Always consider safety and recommend consulting a healthcare provider
+        for significant changes.""";
 
-    @Value("${spring.ai.openai.api-key:}")
-    private String openAiApiKey;
+    private final InsightsProperties properties;
+
+    public AiConfig(InsightsProperties properties) {
+        this.properties = properties;
+    }
 
     @PostConstruct
     public void validateConfiguration() {
-        if (openAiApiKey == null || openAiApiKey.isBlank()) {
+        if (properties.apiKey() == null || properties.apiKey().isBlank()) {
             throw new IllegalStateException(
-                "AI Insights is enabled but OPENAI_API_KEY is not configured. " +
-                "Either set OPENAI_API_KEY environment variable or disable insights with AI_INSIGHTS_ENABLED=false"
+                "AI Insights is enabled but spring.ai.openai.api-key is not configured. " +
+                "Set OPENAI_API_KEY environment variable or disable the feature with app.insights.enabled=false"
             );
         }
         log.info("AI Insights feature enabled with OpenAI integration");
