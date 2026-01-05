@@ -27,13 +27,6 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class InsightsService {
 
-    private static final String SYSTEM_PROMPT = """
-        You are a fitness coach analyzing health metrics and workout data
-        to provide evidence-based, actionable recommendations. Be encouraging
-        but realistic. Focus on gradual improvements and sustainable habits.
-        Always consider safety and recommend consulting a healthcare provider
-        for significant changes.""";
-
     private final ChatClient chatClient;
     private final HealthDataAggregator healthDataAggregator;
     private final PromptBuilder promptBuilder;
@@ -109,7 +102,7 @@ public class InsightsService {
         log.debug("Exported prompt for user: {}", userId);
 
         return new PromptExportResponse(
-            SYSTEM_PROMPT,
+            aiConfig.getSystemPrompt(),
             userPrompt,
             snapshot.generatedAt(),
             snapshot.analysisWindowDays()

@@ -10,6 +10,13 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class AiConfig {
 
+    private static final String SYSTEM_PROMPT = """
+        You are a certified fitness coach and health analyst. Your role is to analyze \
+        health metrics and workout data to provide evidence-based, actionable workout \
+        recommendations. Be encouraging but realistic. Focus on gradual improvements \
+        and sustainable habits. Always consider safety and recommend consulting a \
+        healthcare provider for significant changes.""";
+
     @Value("${app.insights.analysis-window-days:30}")
     private int analysisWindowDays;
 
@@ -19,13 +26,12 @@ public class AiConfig {
     @Bean
     public ChatClient healthInsightsChatClient(ChatClient.Builder builder) {
         return builder
-            .defaultSystem("""
-                You are a certified fitness coach and health analyst. Your role is to analyze \
-                health metrics and workout data to provide evidence-based, actionable workout \
-                recommendations. Be encouraging but realistic. Focus on gradual improvements \
-                and sustainable habits. Always consider safety and recommend consulting a \
-                healthcare provider for significant changes.""")
+            .defaultSystem(SYSTEM_PROMPT)
             .build();
+    }
+
+    public String getSystemPrompt() {
+        return SYSTEM_PROMPT;
     }
 
     public int getAnalysisWindowDays() {
