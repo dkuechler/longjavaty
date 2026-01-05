@@ -53,7 +53,8 @@ public class InsightsService {
 
     @Transactional
     public HealthInsightResponse generateInsight(UUID userId) {
-        AppUser user = findUser(userId);
+        // Acquire pessimistic lock on user to prevent race conditions in rate limiting
+        AppUser user = findUserForUpdate(userId);
         checkRateLimit(userId);
 
         AiInsightRequest request = new AiInsightRequest(user, OffsetDateTime.now());
@@ -146,6 +147,11 @@ public class InsightsService {
 
     private AppUser findUser(UUID userId) {
         return appUserRepository.findById(userId)
+            .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+    }
+
+    private AppUser findUserForUpdate(UUID userId) {
+        return appUserRepository.findByIdForUpdate(userId)
             .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
     }
 
