@@ -173,7 +173,13 @@ public class InsightsService {
 
         if (failedAttemptsLastHour >= properties.maxFailedAttemptsPerHour()) {
             log.warn("User {} exceeded failed attempt limit: {} attempts in last hour", userId, failedAttemptsLastHour);
-            throw new TooManyFailedAttemptsException(now.plusHours(1));
+
+            OffsetDateTime retryAfter = requestRepository
+                .findFirstByUser_IdAndSuccessFalseAndRequestedAtAfterOrderByRequestedAtAsc(userId, oneHourAgo)
+                .map(req -> req.getRequestedAt().plusHours(1))
+                .orElse(now.plusHours(1));
+
+            throw new TooManyFailedAttemptsException(retryAfter);
         }
     }
 

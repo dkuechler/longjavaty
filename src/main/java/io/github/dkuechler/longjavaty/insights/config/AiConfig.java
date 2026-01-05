@@ -24,8 +24,11 @@ public class AiConfig {
         Always consider safety and recommend consulting a healthcare provider
         for significant changes.""";
 
-    @Value("${spring.ai.openai.api-key:}")
-    private String openAiApiKey;
+    private final String openAiApiKey;
+
+    public AiConfig(@Value("${spring.ai.openai.api-key:}") String openAiApiKey) {
+        this.openAiApiKey = openAiApiKey;
+    }
 
     @PostConstruct
     public void validateConfiguration() {
