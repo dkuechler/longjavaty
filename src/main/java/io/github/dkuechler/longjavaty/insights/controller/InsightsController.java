@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,7 +55,9 @@ public class InsightsController {
 
         try {
             HealthInsightResponse response = insightsService.generateInsight(userId);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(response);
         } catch (RateLimitExceededException e) {
             log.info("Rate limit exceeded for user: {}, next available: {}", userId, e.getNextAvailableAt());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
@@ -83,7 +86,9 @@ public class InsightsController {
 
         try {
             PromptExportResponse response = insightsService.exportPrompt(userId);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(response);
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
