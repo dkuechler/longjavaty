@@ -28,11 +28,11 @@ import java.util.UUID;
 public class InsightsService {
 
     private static final String SYSTEM_PROMPT = """
-        You are a certified fitness coach and health analyst. Your role is to analyze \
-        health metrics and workout data to provide evidence-based, actionable workout \
-        recommendations. Be encouraging but realistic. Focus on gradual improvements \
-        and sustainable habits. Always consider safety and recommend consulting a \
-        healthcare provider for significant changes.""";
+        You are a fitness coach analyzing health metrics and workout data
+        to provide evidence-based, actionable recommendations. Be encouraging
+        but realistic. Focus on gradual improvements and sustainable habits.
+        Always consider safety and recommend consulting a healthcare provider
+        for significant changes.""";
 
     private final ChatClient chatClient;
     private final HealthDataAggregator healthDataAggregator;

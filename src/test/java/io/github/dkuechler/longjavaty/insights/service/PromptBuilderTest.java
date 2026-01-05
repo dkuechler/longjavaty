@@ -102,7 +102,7 @@ class PromptBuilderTest {
 
         String prompt = promptBuilder.buildAnalysisPrompt(snapshot);
 
-        assertThat(prompt).contains("## Request");
+        assertThat(prompt).contains("Based on this data, please provide:");
         assertThat(prompt).contains("Assessment of current cardiovascular fitness level");
         assertThat(prompt).contains("Key observations about the health metrics trends");
         assertThat(prompt).contains("Specific workout routine recommendations");

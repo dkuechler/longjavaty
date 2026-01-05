@@ -25,16 +25,15 @@ public class PromptBuilder {
         prompt.append("\n## Workout Activity\n");
         appendWorkoutSummary(prompt, data);
 
-        prompt.append("\n## Request\n");
+        prompt.append("\n\nBased on this data, please provide:\n");
         prompt.append("""
-            Based on this data, please provide:
             1. Assessment of current cardiovascular fitness level
             2. Key observations about the health metrics trends
             3. Specific workout routine recommendations (types, frequency, intensity, duration)
             4. Areas requiring attention or improvement
             5. One actionable goal for the next 30 days
 
-            Keep recommendations evidence-based and achievable. If data is insufficient, \
+            Keep recommendations evidence-based and achievable. If data is insufficient,
             acknowledge limitations and provide general guidance.
             """);
 
