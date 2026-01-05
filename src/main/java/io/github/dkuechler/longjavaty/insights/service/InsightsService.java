@@ -87,7 +87,7 @@ public class InsightsService {
         } catch (Exception e) {
             meterRegistry.counter("insights.generated", "status", "error").increment();
             log.error("AI analysis failed for user: {}", userId, e);
-            throw new RuntimeException("Failed to generate AI analysis", e);
+            throw new AiServiceUnavailableException("AI service is temporarily unavailable", e);
         }
     }
 

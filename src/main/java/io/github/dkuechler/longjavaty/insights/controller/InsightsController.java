@@ -4,6 +4,7 @@ import io.github.dkuechler.longjavaty.insights.controller.dto.HealthInsightRespo
 import io.github.dkuechler.longjavaty.insights.controller.dto.PromptExportResponse;
 import io.github.dkuechler.longjavaty.insights.controller.dto.RateLimitExceededResponse;
 import io.github.dkuechler.longjavaty.insights.controller.dto.RateLimitStatusResponse;
+import io.github.dkuechler.longjavaty.insights.service.AiServiceUnavailableException;
 import io.github.dkuechler.longjavaty.insights.service.InsightsService;
 import io.github.dkuechler.longjavaty.insights.service.RateLimitExceededException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,6 +64,8 @@ public class InsightsController {
                 ));
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (AiServiceUnavailableException e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
         }
     }
 
