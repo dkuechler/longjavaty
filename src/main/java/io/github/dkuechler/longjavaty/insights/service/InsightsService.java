@@ -64,6 +64,7 @@ public class InsightsService {
         // Acquire pessimistic lock on user to prevent race conditions in rate limiting
         AppUser user = findUserForUpdate(userId);
         checkRateLimit(userId);
+        checkFailedAttemptLimit(userId);
 
         AiInsightRequest request = new AiInsightRequest(user, OffsetDateTime.now(clock));
         requestRepository.save(request);
@@ -156,6 +157,23 @@ public class InsightsService {
             OffsetDateTime nextAvailable = lastRequest.get().getRequestedAt()
                 .plusDays(properties.rateLimitDays());
             throw new RateLimitExceededException(nextAvailable);
+        }
+    }
+
+    /**
+     * Checks if user has exceeded failed attempt limit.
+     * Prevents cost abuse from repeated failures.
+     */
+    private void checkFailedAttemptLimit(UUID userId) {
+        OffsetDateTime now = OffsetDateTime.now(clock);
+        OffsetDateTime oneHourAgo = now.minusHours(1);
+
+        long failedAttemptsLastHour = requestRepository
+            .countByUser_IdAndSuccessFalseAndRequestedAtAfter(userId, oneHourAgo);
+
+        if (failedAttemptsLastHour >= properties.maxFailedAttemptsPerHour()) {
+            log.warn("User {} exceeded failed attempt limit: {} attempts in last hour", userId, failedAttemptsLastHour);
+            throw new RateLimitExceededException(now.plusHours(1));
         }
     }
 

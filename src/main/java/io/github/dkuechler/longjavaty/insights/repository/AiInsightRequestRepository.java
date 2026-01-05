@@ -19,6 +19,11 @@ public interface AiInsightRequestRepository extends JpaRepository<AiInsightReque
         OffsetDateTime since
     );
 
+    long countByUser_IdAndSuccessFalseAndRequestedAtAfter(
+        UUID userId,
+        OffsetDateTime since
+    );
+
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM AiInsightRequest r WHERE r.user.id = :userId")
     void deleteAllByUserId(@Param("userId") UUID userId);

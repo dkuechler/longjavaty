@@ -26,7 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(InsightsController.class)
-@TestPropertySource(properties = "app.insights.enabled=true")
+@TestPropertySource(properties = {
+    "app.insights.enabled=true",
+    "app.insights.api-key=test-key-not-used",
+    "spring.ai.openai.api-key=test-key-not-used"
+})
 class InsightsControllerTest {
 
     @Autowired

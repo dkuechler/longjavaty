@@ -49,7 +49,7 @@ public class InsightsController {
     @ApiResponse(responseCode = "404", description = "User not found")
     @ApiResponse(responseCode = "429", description = "Rate limit exceeded")
     @ApiResponse(responseCode = "503", description = "AI service unavailable")
-    public ResponseEntity<?> analyzeHealth(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Object> analyzeHealth(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());
         log.info("AI analysis requested for user: {}", userId);
 
