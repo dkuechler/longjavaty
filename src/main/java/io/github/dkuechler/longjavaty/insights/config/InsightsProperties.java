@@ -10,6 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record InsightsProperties(
     int analysisWindowDays,
     int rateLimitDays,
-    int maxFailedAttemptsPerHour,
-    String apiKey
+    int maxFailedAttemptsPerHour
 ) {}
