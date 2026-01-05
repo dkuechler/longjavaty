@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class AiConfig {
 
     @Value("${app.insights.analysis-window-days:30}")

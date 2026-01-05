@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequestMapping("/api/insights")
 @Slf4j
 @Tag(name = "AI Insights", description = "AI-powered health analysis and workout recommendations")
-@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 public class InsightsController {
 
     private final InsightsService insightsService;
