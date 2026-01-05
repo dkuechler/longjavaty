@@ -5,7 +5,7 @@ import io.github.dkuechler.longjavaty.healthmetrics.model.MeasurementType;
 import io.github.dkuechler.longjavaty.healthmetrics.model.Workout;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.MeasurementRepository;
 import io.github.dkuechler.longjavaty.healthmetrics.repository.WorkoutRepository;
-import io.github.dkuechler.longjavaty.insights.config.AiConfig;
+import io.github.dkuechler.longjavaty.insights.config.InsightsProperties;
 import io.github.dkuechler.longjavaty.insights.model.HealthDataSnapshot;
 import io.github.dkuechler.longjavaty.insights.model.HealthDataSnapshot.Trend;
 import io.github.dkuechler.longjavaty.users.model.AppUser;
@@ -15,7 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,20 +36,20 @@ class HealthDataAggregatorTest {
     @Mock
     private WorkoutRepository workoutRepository;
 
-    @Mock
-    private AiConfig aiConfig;
-
+    private InsightsProperties properties;
+    private Clock clock;
     private HealthDataAggregator aggregator;
     private UUID userId;
     private AppUser user;
 
     @BeforeEach
     void setUp() {
-        aggregator = new HealthDataAggregator(measurementRepository, workoutRepository, aiConfig);
+        properties = new InsightsProperties(30, 7);
+        clock = Clock.fixed(Instant.parse("2024-06-15T10:00:00Z"), ZoneOffset.UTC);
+        aggregator = new HealthDataAggregator(measurementRepository, workoutRepository, properties, clock);
         userId = UUID.randomUUID();
         user = new AppUser("test@example.com");
         user.setId(userId);
-        when(aiConfig.getAnalysisWindowDays()).thenReturn(30);
     }
 
     @Test
@@ -148,7 +151,7 @@ class HealthDataAggregatorTest {
     }
 
     private List<Measurement> createMeasurements(AppUser user, MeasurementType type, double[] values) {
-        OffsetDateTime baseTime = OffsetDateTime.now().minusDays(values.length);
+        OffsetDateTime baseTime = OffsetDateTime.now(clock).minusDays(values.length);
         return java.util.stream.IntStream.range(0, values.length)
             .mapToObj(i -> {
                 Measurement m = new Measurement(user, type, values[i], baseTime.plusDays(i), "test-source-" + i);
@@ -163,7 +166,7 @@ class HealthDataAggregatorTest {
         w.setWorkoutType(type);
         w.setDurationSeconds(durationSeconds);
         w.setAvgHeartRate(avgHeartRate);
-        w.setStartTime(OffsetDateTime.now().minusDays(1));
+        w.setStartTime(OffsetDateTime.now(clock).minusDays(1));
         return w;
     }
 }
