@@ -35,8 +35,8 @@ class PromptBuilderTest {
             .vo2MaxLatest(47.0)
             .averageDailySteps(8500.0)
             .workoutSummaries(List.of(
-                new WorkoutSummary("RUN", 5, 1800, 155),
-                new WorkoutSummary("CYCLE", 3, 2700, 140)
+                new WorkoutSummary("RUN", 5, 1800.0, 155.0),
+                new WorkoutSummary("CYCLE", 3, 2700.0, 140.0)
             ))
             .totalWorkoutsInPeriod(8)
             .userProfile(new UserProfile(35, "MALE", 180.0, 75.0))
