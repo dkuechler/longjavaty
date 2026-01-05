@@ -1,6 +1,9 @@
 package io.github.dkuechler.longjavaty.insights.config;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +14,7 @@ import java.time.Clock;
 @Configuration
 @ConditionalOnProperty(name = "app.insights.enabled", havingValue = "true")
 @EnableConfigurationProperties(InsightsProperties.class)
+@Slf4j
 public class AiConfig {
 
     private static final String SYSTEM_PROMPT = """
@@ -19,6 +23,20 @@ public class AiConfig {
         recommendations. Be encouraging but realistic. Focus on gradual improvements \
         and sustainable habits. Always consider safety and recommend consulting a \
         healthcare provider for significant changes.""";
+
+    @Value("${spring.ai.openai.api-key:}")
+    private String openAiApiKey;
+
+    @PostConstruct
+    public void validateConfiguration() {
+        if (openAiApiKey == null || openAiApiKey.isBlank()) {
+            throw new IllegalStateException(
+                "AI Insights is enabled but OPENAI_API_KEY is not configured. " +
+                "Either set OPENAI_API_KEY environment variable or disable insights with AI_INSIGHTS_ENABLED=false"
+            );
+        }
+        log.info("AI Insights feature enabled with OpenAI integration");
+    }
 
     @Bean
     public ChatClient healthInsightsChatClient(ChatClient.Builder builder) {
