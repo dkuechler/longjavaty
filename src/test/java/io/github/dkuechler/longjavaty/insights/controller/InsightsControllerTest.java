@@ -73,7 +73,7 @@ class InsightsControllerTest {
                 .with(jwt().jwt(jwt -> jwt.subject(userId.toString()))))
             .andExpect(status().isTooManyRequests())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.nextAvailableAt").exists());
+            .andExpect(jsonPath("$.retryAfter").exists());
     }
 
     @Test
