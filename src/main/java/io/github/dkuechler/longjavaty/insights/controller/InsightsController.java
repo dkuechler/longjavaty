@@ -2,8 +2,8 @@ package io.github.dkuechler.longjavaty.insights.controller;
 
 import io.github.dkuechler.longjavaty.insights.controller.dto.HealthInsightResponse;
 import io.github.dkuechler.longjavaty.insights.controller.dto.PromptExportResponse;
-import io.github.dkuechler.longjavaty.insights.controller.dto.RateLimitExceededResponse;
 import io.github.dkuechler.longjavaty.insights.controller.dto.RateLimitStatusResponse;
+import io.github.dkuechler.longjavaty.insights.controller.dto.ThrottledResponse;
 import io.github.dkuechler.longjavaty.insights.service.AiServiceUnavailableException;
 import io.github.dkuechler.longjavaty.insights.service.InsightsService;
 import io.github.dkuechler.longjavaty.insights.service.RateLimitExceededException;
@@ -62,14 +62,14 @@ public class InsightsController {
         } catch (RateLimitExceededException e) {
             log.info("Rate limit exceeded for user: {}, next available: {}", userId, e.getNextAvailableAt());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                .body(new RateLimitExceededResponse(
+                .body(new ThrottledResponse(
                     "Rate limit exceeded. You can request 1 AI analysis per week.",
                     e.getNextAvailableAt()
                 ));
         } catch (TooManyFailedAttemptsException e) {
             log.info("Too many failed attempts for user: {}, retry after: {}", userId, e.getRetryAfter());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                .body(new RateLimitExceededResponse(
+                .body(new ThrottledResponse(
                     "Too many failed attempts. Please try again later.",
                     e.getRetryAfter()
                 ));

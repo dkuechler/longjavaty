@@ -148,7 +148,8 @@ public class InsightsService {
      * when the AI service fails. Users get 1 successful analysis per rate-limit window.
      */
     private void checkRateLimit(UUID userId) {
-        OffsetDateTime rateLimitWindow = OffsetDateTime.now(clock).minusDays(properties.rateLimitDays());
+        OffsetDateTime now = OffsetDateTime.now(clock);
+        OffsetDateTime rateLimitWindow = now.minusDays(properties.rateLimitDays());
 
         Optional<AiInsightRequest> lastRequest = requestRepository
             .findFirstByUser_IdAndSuccessTrueAndRequestedAtAfterOrderByRequestedAtDesc(userId, rateLimitWindow);
@@ -156,7 +157,9 @@ public class InsightsService {
         if (lastRequest.isPresent()) {
             OffsetDateTime nextAvailable = lastRequest.get().getRequestedAt()
                 .plusDays(properties.rateLimitDays());
-            throw new RateLimitExceededException(nextAvailable);
+            if (now.isBefore(nextAvailable)) {
+                throw new RateLimitExceededException(nextAvailable);
+            }
         }
     }
 
