@@ -121,7 +121,7 @@ public class InsightsService {
         OffsetDateTime rateLimitWindow = OffsetDateTime.now().minusDays(aiConfig.getRateLimitDays());
 
         Optional<AiInsightRequest> lastRequest = requestRepository
-            .findLastSuccessfulRequest(userId, rateLimitWindow);
+            .findFirstByUser_IdAndSuccessTrueAndRequestedAtAfterOrderByRequestedAtDesc(userId, rateLimitWindow);
 
         if (lastRequest.isEmpty()) {
             return new RateLimitStatusResponse(true, null, null);
@@ -142,7 +142,7 @@ public class InsightsService {
         OffsetDateTime rateLimitWindow = OffsetDateTime.now().minusDays(aiConfig.getRateLimitDays());
 
         Optional<AiInsightRequest> lastRequest = requestRepository
-            .findLastSuccessfulRequest(userId, rateLimitWindow);
+            .findFirstByUser_IdAndSuccessTrueAndRequestedAtAfterOrderByRequestedAtDesc(userId, rateLimitWindow);
 
         if (lastRequest.isPresent()) {
             OffsetDateTime nextAvailable = lastRequest.get().getRequestedAt()
