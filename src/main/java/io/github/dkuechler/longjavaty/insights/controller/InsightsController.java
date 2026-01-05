@@ -7,6 +7,7 @@ import io.github.dkuechler.longjavaty.insights.controller.dto.RateLimitStatusRes
 import io.github.dkuechler.longjavaty.insights.service.AiServiceUnavailableException;
 import io.github.dkuechler.longjavaty.insights.service.InsightsService;
 import io.github.dkuechler.longjavaty.insights.service.RateLimitExceededException;
+import io.github.dkuechler.longjavaty.insights.service.TooManyFailedAttemptsException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,6 +65,13 @@ public class InsightsController {
                 .body(new RateLimitExceededResponse(
                     "Rate limit exceeded. You can request 1 AI analysis per week.",
                     e.getNextAvailableAt()
+                ));
+        } catch (TooManyFailedAttemptsException e) {
+            log.info("Too many failed attempts for user: {}, retry after: {}", userId, e.getRetryAfter());
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new RateLimitExceededResponse(
+                    "Too many failed attempts. Please try again later.",
+                    e.getRetryAfter()
                 ));
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());

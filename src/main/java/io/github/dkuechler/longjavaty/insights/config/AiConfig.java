@@ -24,18 +24,15 @@ public class AiConfig {
         Always consider safety and recommend consulting a healthcare provider
         for significant changes.""";
 
-    private final InsightsProperties properties;
-
-    public AiConfig(InsightsProperties properties) {
-        this.properties = properties;
-    }
+    @Value("${spring.ai.openai.api-key:}")
+    private String openAiApiKey;
 
     @PostConstruct
     public void validateConfiguration() {
-        if (properties.apiKey() == null || properties.apiKey().isBlank()) {
+        if (openAiApiKey == null || openAiApiKey.isBlank()) {
             throw new IllegalStateException(
-                "AI Insights is enabled but spring.ai.openai.api-key is not configured. " +
-                "Set OPENAI_API_KEY environment variable or disable the feature with app.insights.enabled=false"
+                "AI Insights is enabled but no API key configured. " +
+                "Set OPENAI_API_KEY env var or disable with AI_INSIGHTS_ENABLED=false"
             );
         }
         log.info("AI Insights feature enabled with OpenAI integration");
