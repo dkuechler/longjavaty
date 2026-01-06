@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
@@ -40,9 +41,11 @@ import java.util.UUID;
 public class InsightsController {
 
     private final InsightsService insightsService;
+    private final Clock clock;
 
-    public InsightsController(InsightsService insightsService) {
+    public InsightsController(InsightsService insightsService, Clock insightsClock) {
         this.insightsService = insightsService;
+        this.clock = insightsClock;
     }
 
     @PostMapping("/analyze")
@@ -126,7 +129,7 @@ public class InsightsController {
     }
 
     private long computeRetryAfterSeconds(OffsetDateTime retryAfter) {
-        long seconds = ChronoUnit.SECONDS.between(OffsetDateTime.now(), retryAfter);
+        long seconds = ChronoUnit.SECONDS.between(OffsetDateTime.now(clock), retryAfter);
         return Math.max(0, seconds);
     }
 }
