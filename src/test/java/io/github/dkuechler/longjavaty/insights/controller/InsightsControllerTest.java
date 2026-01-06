@@ -9,10 +9,13 @@ import io.github.dkuechler.longjavaty.users.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -26,11 +29,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(InsightsController.class)
+@Import(InsightsControllerTest.TestConfig.class)
 @TestPropertySource(properties = {
     "app.insights.enabled=true",
     "spring.ai.openai.api-key=test-key-not-used"
 })
 class InsightsControllerTest {
+
+    static class TestConfig {
+        @Bean
+        Clock insightsClock() {
+            return Clock.systemUTC();
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;

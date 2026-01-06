@@ -106,6 +106,9 @@ public class PromptBuilder {
     }
 
     private String formatTrend(Trend trend, boolean lowerIsBetter) {
+        if (trend == null) {
+            return "Insufficient data for trend analysis";
+        }
         return switch (trend) {
             case INCREASING -> lowerIsBetter
                 ? "Increasing (may need attention)"
