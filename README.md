@@ -5,13 +5,14 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen?style=flat-square&logo=spring-boot)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=flat-square&logo=postgresql)
 
-A Spring Boot REST API for tracking health metrics, featuring JIT user synchronization with Keycloak and GDPR-compliant data management.
+A Spring Boot REST API for tracking health metrics with AI-powered analysis. Features JIT user sync with Keycloak and GDPR-compliant data management.
 
 ## Tech Stack
 
 - **Backend:** Java 21, Spring Boot 3.5, Spring Security, JPA/Hibernate
 - **Database:** PostgreSQL 15
 - **Auth:** OIDC / JWT (Keycloak)
+- **AI:** Spring AI with OpenAI (optional)
 - **Infrastructure:** AWS (ECS Fargate, RDS, ECR)
 - **IaC:** Terraform
 
@@ -24,13 +25,14 @@ A Spring Boot REST API for tracking health metrics, featuring JIT user synchroni
    ```
 The API is available on port `8080`.
 
+## Features
+
+### AI Health Insights
+Analyze workout and health metrics using OpenAI's GPT-4o. Rate-limited to prevent abuse (1 successful request per 7 days, 5 failed attempts per hour). Feature flag controlled - enable with `AI_INSIGHTS_ENABLED=true` and `OPENAI_API_KEY`.
+
 ## Cloud Infrastructure
 
-The infrastructure is defined in the [`terraform/`](./terraform) directory.
-
-- **ECS Fargate:** Task execution using Spot instances for cost savings.
-- **RDS:** Managed PostgreSQL instance.
-- **Networking:** Custom VPC with multi-AZ public subnets.
+Terraform modules in [`terraform/`](./terraform) provision the stack: VPC networking, ECS Fargate with Spot instances, and RDS PostgreSQL.
 
 ## Security & GDPR
 
